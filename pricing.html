@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Fiyatlandırma</title>
+    <meta name="description"
+        content="Med Shifter fiyatlandırma planları. Ücretsiz, Bireysel ve Business planlarını karşılaştırın.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 50%, #1a1a2e 100%);
+            z-index: -2;
+        }
+
+        .bg-animation::before,
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+        }
+
+        .bg-animation::before {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .bg-animation::after {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            bottom: -100px;
+            left: -100px;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, 30px);
+            }
+        }
+
+        /* Header */
+        .header {
+            padding: 1.5rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: white;
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white !important;
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .btn-login-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 8rem 2rem 4rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero */
+        .pricing-hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .pricing-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, white 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pricing-hero p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Toggle */
+        .billing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .billing-toggle span {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .billing-toggle span.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--dark-light);
+            border-radius: 50px;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.yearly::after {
+            transform: translateX(24px);
+        }
+
+        .save-badge {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Currency Toggle */
+        .currency-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .currency-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .currency-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-color: transparent;
+            color: white;
+            font-weight: 600;
+        }
+
+        .currency-btn:hover:not(.active) {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+
+        /* Pricing Cards */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.4s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .pricing-card.popular {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.popular:hover {
+            transform: scale(1.05) translateY(-8px);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .plan-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-card.free .plan-icon {
+            background: linear-gradient(135deg, var(--gray) 0%, var(--dark-light) 100%);
+        }
+
+        .pricing-card.business .plan-icon {
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .plan-price {
+            margin-bottom: 2rem;
+        }
+
+        .price-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .price-currency {
+            font-size: 1.5rem;
+            font-weight: 600;
+            vertical-align: top;
+        }
+
+        .price-period {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            color: var(--success);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .feature-icon.limited {
+            color: var(--gray);
+        }
+
+        .feature-text {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .feature-text strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Feature Comparison */
+        .comparison-section {
+            margin-top: 4rem;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .comparison-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-header p {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th:first-child,
+        .comparison-table td:first-child {
+            text-align: left;
+        }
+
+        .comparison-table td:first-child {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check {
+            color: var(--success);
+            font-size: 1.25rem;
+        }
+
+        .cross {
+            color: var(--gray);
+            font-size: 1.25rem;
+        }
+
+        /* FAQ */
+        .faq-section {
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .faq-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            text-align: left;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .faq-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-item p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* Enterprise Section */
+        .enterprise-section {
+            margin-bottom: 3rem;
+        }
+
+        .enterprise-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .enterprise-content {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .enterprise-icon {
+            font-size: 3rem;
+        }
+
+        .enterprise-text h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .enterprise-text p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            max-width: 500px;
+        }
+
+        .enterprise-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            justify-content: center;
+        }
+
+        .enterprise-features span {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .btn-enterprise {
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-enterprise:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 450px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .pricing-card.popular {
+                transform: none;
+            }
+
+            .pricing-card.popular:hover {
+                transform: translateY(-8px);
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 23, 42, 0.98);
+                backdrop-filter: blur(20px);
+                padding: 1rem 2rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 0;
+            }
+
+            .nav.open {
+                display: flex;
+            }
+
+            .nav a {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .hamburger {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                cursor: pointer;
+                padding: 8px;
+                z-index: 10;
+            }
+
+            .hamburger span {
+                width: 24px;
+                height: 2px;
+                background: #e2e8f0;
+                border-radius: 2px;
+                transition: transform 0.3s, opacity 0.3s;
+            }
+
+            .hamburger.open span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.open span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.open span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            .header-content {
+                position: relative;
+            }
+
+            .pricing-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+
+        .hamburger {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>Shifter</span></div>
+            </a>
+            <div class="hamburger" id="hamburger"
+                onclick="document.getElementById('hamburger').classList.toggle('open');document.getElementById('mainNav').classList.toggle('open');">
+                <span></span><span></span><span></span>
+            </div>
+            <nav class="nav" id="mainNav">
+                <a href="/">Ana Sayfa</a>
+                <a href="/#features">Özellikler</a>
+                <a href="/pricing">Fiyatlandırma</a>
+                <a href="/contact">İletişim</a>
+                <a href="/support">Destek</a>
+                <a href="/login" class="btn-login-nav">Giriş</a>
+                <a href="/app" class="btn-cta app-link">Uygulamaya Git</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Hero -->
+            <div class="pricing-hero">
+                <h1>Şeffaf Fiyatlandırma</h1>
+                <p>İhtiyacınıza uygun planı seçin. Gizli ücret yok, sürpriz yok.</p>
+            </div>
+
+            <!-- Currency Toggle -->
+            <div class="currency-toggle">
+                <button class="currency-btn" id="usdBtn" onclick="setCurrency('usd')">$ USD</button>
+                <button class="currency-btn active" id="tryBtn" onclick="setCurrency('try')">₺ TL</button>
+            </div>
+
+            <!-- Billing Toggle -->
+            <div class="billing-toggle">
+                <span id="monthlyLabel" class="active">Aylık</span>
+                <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"></div>
+                <span id="yearlyLabel">Yıllık</span>
+                <span class="save-badge">%50 Tasarruf</span>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card free">
+                    <div class="plan-icon">🆓</div>
+                    <div class="plan-name">Ücretsiz</div>
+                    <div class="plan-desc">Denemek için ideal</div>
+                    <div class="plan-price">
+                        <span class="price-currency">₺</span>
+                        <span class="price-amount">0</span>
+                        <span class="price-period">/ sonsuza dek</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>1</strong> takvim oluşturma (ömür boyu)</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>5</strong> koşul limiti</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>5</strong> personel limiti</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>3</strong> versiyon hakkı</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon limited">✗</span>
+                            <span class="feature-text">Öncelikli destek</span>
+                        </li>
+                    </ul>
+                    <a href="/app" class="btn btn-outline app-link">Ücretsiz Başla</a>
+                </div>
+
+                <!-- Individual Plan -->
+                <div class="pricing-card popular">
+                    <div class="popular-badge">En Popüler</div>
+                    <div class="plan-icon">👤</div>
+                    <div class="plan-name">Bireysel</div>
+                    <div class="plan-desc">Bireysel kullanıcılar için</div>
+                    <div class="plan-price" id="individualPrice">
+                        <span class="price-currency">₺</span>
+                        <span class="price-amount" data-usd-monthly="19" data-usd-yearly="5" data-try-monthly="380"
+                            data-try-yearly="190">190</span>
+                        <span class="price-period" data-monthly="/ ay" data-yearly="/ ay (yıllık faturalandırılır)">/
+                            ay</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>5</strong> takvim oluşturma / ay</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>10</strong> koşul limiti</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>15</strong> personel limiti</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>15</strong> versiyon hakkı / ay</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text">E-posta desteği</span>
+                        </li>
+                    </ul>
+                    <a href="/checkout?plan=INDIVIDUAL&period=yearly" class="btn btn-primary checkout-link"
+                        data-plan="INDIVIDUAL">Planı Seç</a>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="pricing-card business">
+                    <div class="plan-icon">🏢</div>
+                    <div class="plan-name">Business</div>
+                    <div class="plan-desc">Ekipler ve kurumlar için</div>
+                    <div class="plan-price" id="businessPrice">
+                        <span class="price-currency">₺</span>
+                        <span class="price-amount" data-usd-monthly="59" data-usd-yearly="15" data-try-monthly="1180"
+                            data-try-yearly="590">590</span>
+                        <span class="price-period" data-monthly="/ ay" data-yearly="/ ay (yıllık faturalandırılır)">/
+                            ay</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>25</strong> takvim oluşturma / ay</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>50</strong> koşul limiti</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>50</strong> personel limiti</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text"><strong>75</strong> versiyon hakkı / ay</span>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✓</span>
+                            <span class="feature-text">Öncelikli destek</span>
+                        </li>
+                    </ul>
+                    <a href="/checkout?plan=BUSINESS&period=yearly" class="btn btn-primary checkout-link"
+                        data-plan="BUSINESS">Planı Seç</a>
+                </div>
+            </div>
+
+            <!-- Enterprise Section -->
+            <div class="enterprise-section">
+                <div class="enterprise-card">
+                    <div class="enterprise-content">
+                        <div class="enterprise-icon">🏛️</div>
+                        <div class="enterprise-text">
+                            <h3>Kurumsal Çözümler</h3>
+                            <p>Büyük hastaneler, sağlık grupları ve özel gereksinimler için kurumsal planlarımız
+                                hakkında bilgi alın.</p>
+                        </div>
+                    </div>
+                    <div class="enterprise-features">
+                        <span>✓ Sınırsız kullanıcı</span>
+                        <span>✓ Özel entegrasyonlar</span>
+                        <span>✓ Dedike destek</span>
+                        <span>✓ SLA garantisi</span>
+                    </div>
+                    <a href="mailto:kurumsal@medshifter.com" class="btn btn-enterprise">
+                        İletişime Geçin →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-section">
+                <div class="comparison-header">
+                    <h2>Detaylı Karşılaştırma</h2>
+                    <p>Tüm plan özelliklerini karşılaştırın</p>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Özellik</th>
+                                <th>Ücretsiz</th>
+                                <th>Bireysel</th>
+                                <th>Business</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Takvim Oluşturma</td>
+                                <td>1 (ömür boyu)</td>
+                                <td>5 / ay</td>
+                                <td>25 / ay</td>
+                            </tr>
+                            <tr>
+                                <td>Koşul Sayısı</td>
+                                <td>5</td>
+                                <td>10</td>
+                                <td>50</td>
+                            </tr>
+                            <tr>
+                                <td>Personel Limiti</td>
+                                <td>5</td>
+                                <td>15</td>
+                                <td>50</td>
+                            </tr>
+                            <tr>
+                                <td>Versiyon Hakkı</td>
+                                <td>3</td>
+                                <td>15 / ay</td>
+                                <td>75 / ay</td>
+                            </tr>
+                            <tr>
+                                <td>E-posta Desteği</td>
+                                <td><span class="cross">✗</span></td>
+                                <td><span class="check">✓</span></td>
+                                <td><span class="check">✓</span></td>
+                            </tr>
+                            <tr>
+                                <td>Öncelikli Destek</td>
+                                <td><span class="cross">✗</span></td>
+                                <td><span class="cross">✗</span></td>
+                                <td><span class="check">✓</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="faq-section">
+                <h2>Sıkça Sorulan Sorular</h2>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>Ödeme yöntemleri nelerdir?</h3>
+                        <p>Stripe ve PayTR üzerinden kredi kartı, banka kartı ile ödeme yapabilirsiniz.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Planımı değiştirebilir miyim?</h3>
+                        <p>Evet, istediğiniz zaman üst plana geçebilirsiniz. Fark, gün hesabıyla yansıtılır.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>İptal edebilir miyim?</h3>
+                        <p>Evet, istediğiniz zaman iptal edebilirsiniz. Kalan süreniz boyunca kullanmaya devam
+                            edersiniz.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Ücretsiz deneme var mı?</h3>
+                        <p>Ücretsiz plan ile tüm temel özellikleri deneyebilirsiniz. Kayıt bile gerekmez!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/">Ana Sayfa</a>
+                <a href="/app">Uygulama</a>
+                <a href="/pricing">Fiyatlandırma</a>
+                <a href="/support">Destek</a>
+            </div>
+            <p class="footer-copyright">© 2026 Med Shifter. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js?v=2.0.2"></script>
+    <script>
+        const supabaseClient = window.supabase.createClient(
+            window.AppConfig.SUPABASE_URL,
+            window.AppConfig.SUPABASE_ANON_KEY
+        );
+
+        let isYearly = true;
+        let currency = 'try'; // 'usd' or 'try'
+
+        function updatePrices() {
+            const priceAmounts = document.querySelectorAll('.price-amount[data-usd-monthly]');
+            const pricePeriods = document.querySelectorAll('.price-period[data-monthly]');
+            const priceCurrencies = document.querySelectorAll('.price-currency');
+
+            // Update currency symbol
+            const currencySymbol = currency === 'usd' ? '$' : '₺';
+            priceCurrencies.forEach(el => {
+                el.textContent = currencySymbol;
+            });
+
+            // Update price amounts based on currency and billing period
+            priceAmounts.forEach(el => {
+                const key = `${currency}-${isYearly ? 'yearly' : 'monthly'}`;
+                const dataKey = key.replace('-', '');
+                // Convert key format: "usd-yearly" -> "usdYearly"
+                const camelKey = currency + (isYearly ? 'Yearly' : 'Monthly');
+                el.textContent = el.dataset[camelKey];
+            });
+
+            // Update period text
+            pricePeriods.forEach(el => {
+                el.textContent = isYearly ? el.dataset.yearly : el.dataset.monthly;
+            });
+        }
+
+        function toggleBilling() {
+            isYearly = !isYearly;
+
+            // Toggle switch appearance
+            const toggle = document.getElementById('billingToggle');
+            toggle.classList.toggle('yearly', isYearly);
+
+            // Toggle labels
+            document.getElementById('monthlyLabel').classList.toggle('active', !isYearly);
+            document.getElementById('yearlyLabel').classList.toggle('active', isYearly);
+
+            updatePrices();
+        }
+
+        function setCurrency(curr) {
+            currency = curr;
+
+            // Update button states
+            document.getElementById('usdBtn').classList.toggle('active', curr === 'usd');
+            document.getElementById('tryBtn').classList.toggle('active', curr === 'try');
+
+            updatePrices();
+        }
+
+        // Initialize on page load with yearly USD as default
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set toggle to yearly position
+            document.getElementById('billingToggle').classList.add('yearly');
+            // Set labels
+            document.getElementById('monthlyLabel').classList.remove('active');
+            document.getElementById('yearlyLabel').classList.add('active');
+            // Update all prices
+            updatePrices();
+
+            // Auth check for app links - redirect guests to login (Supabase session based)
+            document.querySelectorAll('.app-link').forEach(link => {
+                link.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        window.location.href = '/app';
+                    } else {
+                        window.location.href = '/login.html?redirect=app&message=auth_required';
+                    }
+                });
+            });
+
+            // Checkout links - pass current billing period and currency
+            document.querySelectorAll('.checkout-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const plan = this.dataset.plan;
+                    const period = isYearly ? 'yearly' : 'monthly';
+                    const curr = currency === 'usd' ? 'USD' : 'TRY';
+                    window.location.href = `/checkout?plan=${plan}&period=${period}&currency=${curr}`;
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

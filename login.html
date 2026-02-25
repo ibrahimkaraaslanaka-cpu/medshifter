@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Giriş Yap</title>
+    <meta name="description" content="Med Shifter'a giriş yapın veya yeni hesap oluşturun.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --accent: #8b5cf6;
+            --accent-pink: #ec4899;
+            --success: #10b981;
+            --error: #ef4444;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated Background - PRESERVED */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 50%, #1a1a2e 100%);
+            z-index: -2;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            top: -100px;
+            right: -100px;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            bottom: -100px;
+            left: -100px;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, 30px);
+            }
+        }
+
+        /* Floating Medical Icons */
+        .floating-icons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.08;
+            animation: floatUp 20s linear infinite;
+        }
+
+        .floating-icon:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+            animation-duration: 25s;
+        }
+
+        .floating-icon:nth-child(2) {
+            left: 20%;
+            animation-delay: 2s;
+            animation-duration: 20s;
+        }
+
+        .floating-icon:nth-child(3) {
+            left: 35%;
+            animation-delay: 4s;
+            animation-duration: 28s;
+        }
+
+        .floating-icon:nth-child(4) {
+            left: 50%;
+            animation-delay: 1s;
+            animation-duration: 22s;
+        }
+
+        .floating-icon:nth-child(5) {
+            left: 65%;
+            animation-delay: 3s;
+            animation-duration: 24s;
+        }
+
+        .floating-icon:nth-child(6) {
+            left: 80%;
+            animation-delay: 5s;
+            animation-duration: 26s;
+        }
+
+        .floating-icon:nth-child(7) {
+            left: 90%;
+            animation-delay: 2.5s;
+            animation-duration: 21s;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.08;
+            }
+
+            90% {
+                opacity: 0.08;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Container */
+        .auth-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 1.5rem;
+            position: relative;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Premium Glassmorphism Card with Animated Border */
+        .auth-card {
+            position: relative;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 24px;
+            padding: 1.75rem 2.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 0 80px rgba(14, 165, 233, 0.1);
+            overflow: hidden;
+        }
+
+        /* Animated Gradient Border */
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg,
+                    var(--primary),
+                    var(--accent),
+                    var(--accent-pink),
+                    var(--primary));
+            background-size: 400% 400%;
+            border-radius: 30px;
+            z-index: -1;
+            animation: gradientShift 8s ease infinite;
+            opacity: 0.5;
+        }
+
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 28px;
+            z-index: -1;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Logo with Glow */
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            text-decoration: none;
+            color: white;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.4));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px rgba(14, 165, 233, 0.6));
+            }
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .logo-text {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Welcome Text */
+        .auth-welcome {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-welcome h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-welcome p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        /* Premium Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 5px;
+            position: relative;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.85rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35);
+            transform: scale(1.02);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .label-icon {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.05);
+            box-shadow:
+                0 0 0 4px rgba(14, 165, 233, 0.1),
+                0 0 20px rgba(14, 165, 233, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Primary Button with Shine Effect */
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Messages */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        /* Google Button */
+        .btn-google {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 14px;
+            color: #1f2937;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-google::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn-google:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-google:hover::before {
+            opacity: 0.1;
+        }
+
+        .btn-google:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .google-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* Footer Links */
+        .footer-links {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-links a::before {
+            content: '←';
+            transition: transform 0.3s;
+        }
+
+        .footer-links a:hover::before {
+            transform: translateX(-4px);
+        }
+
+        #registerForm {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Sparkle decoration */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        .sparkle:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .sparkle:nth-child(2) {
+            top: 10%;
+            right: 15%;
+            animation-delay: 0.5s;
+        }
+
+        .sparkle:nth-child(3) {
+            bottom: 25%;
+            right: 10%;
+            animation-delay: 1s;
+        }
+
+        .sparkle:nth-child(4) {
+            bottom: 15%;
+            left: 20%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes sparkle {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+
+        /* Corner decoration */
+        .corner-glow {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            pointer-events: none;
+        }
+
+        .corner-glow.top-right {
+            top: -50px;
+            right: -50px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+        }
+
+        .corner-glow.bottom-left {
+            bottom: -50px;
+            left: -50px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <div class="bg-animation"></div>
+
+    <!-- Floating Medical Icons -->
+    <div class="floating-icons">
+        <span class="floating-icon">💊</span>
+        <span class="floating-icon">🩺</span>
+        <span class="floating-icon">💉</span>
+        <span class="floating-icon">🏥</span>
+        <span class="floating-icon">❤️</span>
+        <span class="floating-icon">🩹</span>
+        <span class="floating-icon">⚕️</span>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Decorative Elements -->
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="corner-glow top-right"></div>
+            <div class="corner-glow bottom-left"></div>
+
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>Shifter</span></div>
+            </a>
+
+            <!-- Welcome Text -->
+            <div class="auth-welcome">
+                <h2>Hoş Geldiniz</h2>
+                <p>Hesabınıza giriş yapın veya yeni hesap oluşturun</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showLogin()">Giriş Yap</button>
+                <button class="tab" onclick="showRegister()">Kayıt Ol</button>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="ornek@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Şifre</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    Giriş Yap
+                </button>
+
+                <div class="divider">veya</div>
+
+                <button type="button" class="btn-google" id="googleLoginBtn" onclick="handleGoogleSignIn()">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Google ile devam et
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label class="form-label">Ad Soyad</label>
+                    <input type="text" class="form-input" id="registerName" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" placeholder="ornek@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Şifre</label>
+                    <input type="password" class="form-input" id="registerPassword" placeholder="En az 6 karakter"
+                        required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" id="registerBtn">
+                    Kayıt Ol
+                </button>
+
+                <div class="divider">veya</div>
+
+                <button type="button" class="btn-google" onclick="handleGoogleSignIn()">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Google ile devam et
+                </button>
+            </form>
+
+            <div class="footer-links">
+                <a href="/">← Ana Sayfaya Dön</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js?v=2.0.2"></script>
+    <script>
+        // Initialize Supabase client
+        const supabaseClient = window.supabase.createClient(
+            window.AppConfig.SUPABASE_URL,
+            window.AppConfig.SUPABASE_ANON_KEY
+        );
+
+        // Tab switching
+        function showLogin() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            clearMessages();
+        }
+
+        function showRegister() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            clearMessages();
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function setLoading(button, loading) {
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<span class="loading"></span>Lütfen bekleyin...';
+            } else {
+                button.disabled = false;
+                button.textContent = button.id === 'loginBtn' ? 'Giriş Yap' : 'Kayıt Ol';
+            }
+        }
+
+        // Login with Supabase
+        async function handleLogin(e) {
+            e.preventDefault();
+            clearMessages();
+
+            const btn = document.getElementById('loginBtn');
+            setLoading(btn, true);
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) {
+                    throw new Error(error.message === 'Invalid login credentials'
+                        ? 'Geçersiz email veya şifre'
+                        : error.message);
+                }
+
+                showSuccess('Giriş başarılı! Yönlendiriliyorsunuz...');
+
+                setTimeout(() => {
+                    window.location.href = '/app';
+                }, 1000);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        // Register with Supabase
+        async function handleRegister(e) {
+            e.preventDefault();
+            clearMessages();
+
+            const btn = document.getElementById('registerBtn');
+            setLoading(btn, true);
+
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            name: name
+                        }
+                    }
+                });
+
+                if (error) {
+                    throw new Error(error.message === 'User already registered'
+                        ? 'Bu email zaten kayıtlı'
+                        : error.message);
+                }
+
+                // Check if email confirmation is required
+                if (data.user && !data.session) {
+                    showSuccess('Kayıt başarılı! Email adresinize gönderilen onay linkine tıklayın.');
+                } else {
+                    showSuccess('Kayıt başarılı! Yönlendiriliyorsunuz...');
+                    setTimeout(() => {
+                        window.location.href = '/app';
+                    }, 1000);
+                }
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        // Google Sign-In with Supabase OAuth
+        async function handleGoogleSignIn() {
+            clearMessages();
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/app'
+                    }
+                });
+
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                // Supabase will redirect to Google
+            } catch (error) {
+                showError('Google ile giriş başarısız: ' + error.message);
+            }
+        }
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Check for auth_required message
+            if (urlParams.get('message') === 'auth_required') {
+                showError('Uygulamayı kullanmak için giriş yapmanız veya kayıt olmanız gerekmektedir.');
+            }
+
+            // Check existing session
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                const redirect = urlParams.get('redirect');
+                window.location.href = redirect ? `/${redirect}` : '/app';
+            }
+        });
+    </script>
+</body>
+
+</html>

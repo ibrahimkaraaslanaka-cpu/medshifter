@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanım Koşulları - Med Shifter</title>
+    <meta name="description" content="Med Shifter kullanım koşulları ve hizmet şartları.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: white;
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 1.5rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 7rem 2rem 4rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, white 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            color: rgba(255, 255, 255, 0.8);
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>Shifter</span></div>
+            </a>
+        </div>
+    </header>
+
+    <main class="main">
+        <a href="/" class="back-link">← Ana Sayfaya Dön</a>
+
+        <h1>Kullanım Koşulları</h1>
+        <p class="subtitle">Son güncelleme: Şubat 2026</p>
+
+        <div class="card">
+            <h2>1. Hizmet Tanımı</h2>
+            <p>Med Shifter, sağlık kurumları için vardiya ve çalışma programı oluşturma hizmeti sunan bir SaaS (Hizmet
+                Olarak Yazılım) platformudur.</p>
+        </div>
+
+        <div class="card">
+            <h2>2. Hesap Oluşturma</h2>
+            <ul>
+                <li>Hizmeti kullanmak için geçerli bir e-posta adresi ile hesap oluşturmanız gerekir</li>
+                <li>Hesap bilgilerinizin güvenliğinden siz sorumlusunuz</li>
+                <li>Hesabınızda şüpheli bir aktivite fark ederseniz derhal bizimle iletişime geçin</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>3. Ücretlendirme</h2>
+            <ul>
+                <li>Ücretsiz plan belirli özellikler ile sınırlıdır</li>
+                <li>Ücretli planlar aylık veya yıllık olarak faturalandırılır</li>
+                <li>Fiyat değişiklikleri en az 30 gün önceden bildirilir</li>
+                <li>İptal talepleri cari dönem sonunda geçerli olur</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>4. Kullanıcı Yükümlülükleri</h2>
+            <p>Platformu kullanırken aşağıdaki kurallara uymayı kabul edersiniz:</p>
+            <ul>
+                <li>Yasalara aykırı içerik oluşturmamak</li>
+                <li>Başkalarının haklarını ihlal etmemek</li>
+                <li>Sistemi kötüye kullanmamak veya zarar vermemek</li>
+                <li>Otomatik botlar veya scraping araçları kullanmamak</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>5. Fikri Mülkiyet</h2>
+            <p>Med Shifter platformu, logosu, tasarımı ve tüm içeriği fikri mülkiyet haklarıyla korunmaktadır.
+                Kullanıcılar platformda oluşturdukları içeriklerin sahipliğini korur.</p>
+        </div>
+
+        <div class="card">
+            <h2>6. Sorumluluk Sınırları</h2>
+            <ul>
+                <li>Hizmet "olduğu gibi" sunulmaktadır</li>
+                <li>Kesintisiz veya hatasız hizmet garantisi verilmemektedir</li>
+                <li>Kullanıcı verilerinin yedeklenmesi kullanıcının sorumluluğundadır</li>
+                <li>Dolaylı veya sonuç olarak ortaya çıkan zararlardan sorumlu değiliz</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>7. Hesap Sonlandırma</h2>
+            <p>Aşağıdaki durumlarda hesabınızı askıya alabilir veya sonlandırabiliriz:</p>
+            <ul>
+                <li>Kullanım koşullarının ihlali</li>
+                <li>Uzun süreli hareketsizlik</li>
+                <li>Ödeme yükümlülüklerinin yerine getirilmemesi</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>8. Değişiklikler</h2>
+            <p>Bu koşulları önceden bildirimde bulunarak değiştirme hakkını saklı tutarız. Değişiklikler yayınlandıktan
+                sonra platformu kullanmaya devam etmeniz, yeni koşulları kabul ettiğiniz anlamına gelir.</p>
+        </div>
+
+        <div class="card">
+            <h2>9. Uygulanacak Hukuk</h2>
+            <p>Bu sözleşme Türkiye Cumhuriyeti kanunlarına tabidir. Uyuşmazlıklarda İstanbul mahkemeleri yetkilidir.</p>
+        </div>
+
+        <div class="card">
+            <h2>10. İletişim</h2>
+            <p>Sorularınız için:</p>
+            <p><strong>E-posta:</strong> info@medshifter.com</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Med Shifter. Tüm hakları saklıdır.</p>
+    </footer>
+</body>
+
+</html>

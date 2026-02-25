@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Çalışma Programı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+
+        .header .date-info {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        table {
+            width: max-content;
+            min-width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .scroll-notice {
+            display: none;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            background: #dbeafe;
+            border-radius: 8px;
+            color: #1e40af;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .scroll-notice.visible {
+            display: block;
+        }
+
+        th {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.75rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            min-width: 90px;
+            white-space: nowrap;
+        }
+
+        th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        td {
+            padding: 0.65rem 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tr:hover {
+            background: #eff6ff;
+        }
+
+        .day-cell {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .date-cell {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .person-cell {
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .person-cell.empty {
+            color: #cbd5e1;
+            font-style: italic;
+        }
+
+        .nobetci-cell {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .week-divider td {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .print-actions {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-radius: 12px;
+            border: 1px solid #bae6fd;
+        }
+
+        .print-actions p {
+            color: #0369a1;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .no-data h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                padding: 0.5rem;
+            }
+
+            .print-actions {
+                display: none !important;
+            }
+
+            .header {
+                margin-bottom: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th,
+            td {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .footer {
+                margin-top: 1rem;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th,
+            td {
+                padding: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Med Shifter</h1>
+            <p class="subtitle" id="scheduleTitle">Çalışma Programı</p>
+            <p class="date-info" id="dateInfo"></p>
+        </div>
+
+        <div class="print-actions" id="printActions">
+            <p>💡 Bu sayfanın ekran görüntüsünü alabilir veya yazdırabilirsiniz</p>
+            <button class="btn" onclick="window.print()">🖨️ Yazdır / PDF Kaydet</button>
+        </div>
+
+        <div class="scroll-notice" id="scrollNotice">
+            👆 Sağa/sola kaydırarak tüm alanları görebilirsiniz
+        </div>
+
+        <div class="table-scroll" id="tableScroll">
+            <div id="tableContainer">
+                <!-- Table will be rendered here -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Med Shifter. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+
+    <script>
+        // Load data from localStorage
+        function loadAndRender() {
+            const saved = localStorage.getItem('hospitalScheduleApp');
+
+            if (!saved) {
+                showNoData();
+                return;
+            }
+
+            try {
+                const data = JSON.parse(saved);
+
+                if (!data.schedule || data.schedule.length === 0) {
+                    showNoData();
+                    return;
+                }
+
+                renderSchedule(data);
+            } catch (e) {
+                console.error('Error loading data:', e);
+                showNoData();
+            }
+        }
+
+        function showNoData() {
+            document.getElementById('tableContainer').innerHTML = `
+                <div class="no-data">
+                    <h2>📋 Henüz program oluşturulmamış</h2>
+                    <p>Ana sayfadan bir çalışma programı oluşturun ve tekrar deneyin.</p>
+                </div>
+            `;
+        }
+
+        function renderSchedule(data) {
+            const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+            // Set title
+            const month = monthNames[data.selectedMonth] || '';
+            const year = data.selectedYear || '';
+            document.getElementById('scheduleTitle').textContent = `${month} ${year} Çalışma Programı`;
+
+            // Set date info
+            const now = new Date();
+            document.getElementById('dateInfo').textContent =
+                `Oluşturulma: ${now.toLocaleDateString('tr-TR')} ${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+
+            // Build table
+            const workAreas = data.workAreas || [
+                { id: 1, name: 'Çalışma Alanı 1' },
+                { id: 2, name: 'Çalışma Alanı 2' },
+                { id: 3, name: 'Çalışma Alanı 3' }
+            ];
+
+            let html = '<table>';
+
+            // Header
+            html += '<thead><tr>';
+            html += '<th>Gün</th>';
+            html += '<th>Tarih</th>';
+            workAreas.forEach(area => {
+                html += `<th>${area.name}</th>`;
+            });
+            html += '<th>Nöbet Ertesi</th>';
+            html += '</tr></thead>';
+
+            // Body
+            html += '<tbody>';
+            let lastWeek = null;
+
+            data.schedule.forEach((day, index) => {
+                const date = new Date(day.date);
+                const dayName = day.dayName || '';
+                const dateStr = formatDate(date);
+
+                // Add week divider
+                const weekClass = day.weekNumber !== lastWeek && lastWeek !== null ? 'week-divider' : '';
+                lastWeek = day.weekNumber;
+
+                html += `<tr class="${weekClass}">`;
+                html += `<td class="day-cell">${dayName}</td>`;
+                html += `<td class="date-cell">${dateStr}</td>`;
+
+                workAreas.forEach(area => {
+                    const person = day[`workArea${area.id}`] || '';
+                    const cellClass = person ? 'person-cell' : 'person-cell empty';
+                    html += `<td class="${cellClass}">${person || '-'}</td>`;
+                });
+
+                const nobetci = day.nobetErtesi || '';
+                if (nobetci) {
+                    html += `<td class="nobetci-cell">${nobetci}</td>`;
+                } else {
+                    html += '<td class="person-cell empty">-</td>';
+                }
+
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+
+            document.getElementById('tableContainer').innerHTML = html;
+
+            // Check if scroll is needed
+            setTimeout(() => {
+                const tableScroll = document.getElementById('tableScroll');
+                const scrollNotice = document.getElementById('scrollNotice');
+                if (tableScroll && tableScroll.scrollWidth > tableScroll.clientWidth) {
+                    if (scrollNotice) scrollNotice.classList.add('visible');
+                }
+            }, 100);
+        }
+
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadAndRender);
+    </script>
+</body>
+
+</html>

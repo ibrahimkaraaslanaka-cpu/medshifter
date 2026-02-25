@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Hastane Vardiya Yönetimi</title>
+    <meta name="description"
+        content="Hastane ve sağlık kurumları için modern vardiya planlama uygulaması. Kolay, hızlı, ücretsiz.">
+    <meta name="keywords" content="vardiya yönetimi, hastane, sağlık, çalışma programı, nöbet, shift planning">
+    <meta property="og:title" content="Med Shifter - Hastane Vardiya Yönetimi">
+    <meta property="og:description" content="Hastane vardiya yönetimi artık kolay!">
+    <meta property="og:type" content="website">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --accent: #8b5cf6;
+            --accent-light: #c4b5fd;
+            --success: #10b981;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: var(--light);
+        }
+
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            overflow: hidden;
+        }
+
+        .bg-animated::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-2%, 2%) rotate(5deg);
+            }
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: orbFloat 15s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            top: 10%;
+            left: 10%;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            bottom: 20%;
+            right: 15%;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--success);
+            top: 60%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .logo-text span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+
+        .nav a:hover {
+            color: white;
+        }
+
+        .nav a:hover::after {
+            width: 100%;
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 0.75rem 1.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(14, 165, 233, 0.5);
+        }
+
+        .btn-login-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-nav-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            padding: 0.4rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            transition: all 0.2s;
+        }
+
+        .user-nav-badge:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-nav-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .user-nav-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn-logout-nav {
+            background: transparent;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: rgba(239, 68, 68, 0.9);
+            padding: 0.4rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout-nav:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.6);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text {
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .hero-text h1 .gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 8px 30px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(14, 165, 233, 0.5);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .hero-image {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+            animation: heroFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes heroFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+        }
+
+        .features {
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.95) 0%, rgba(224, 242, 254, 0.9) 50%, rgba(221, 214, 254, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(14, 165, 233, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .features>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #ddd6fe 100%);
+            color: var(--accent);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .bento-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .bento-card {
+            background: var(--light);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .bento-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .bento-card.featured {
+            grid-column: span 4;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .bento-card.featured .bento-icon {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bento-card.featured h3,
+        .bento-card.featured p {
+            color: white;
+        }
+
+        .bento-card.featured p {
+            opacity: 0.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bento-card.accent {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+        }
+
+        .bento-card.accent h3,
+        .bento-card.accent p {
+            color: white;
+        }
+
+        .bento-card.accent p {
+            opacity: 0.85;
+        }
+
+        .bento-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bento-card.featured .bento-icon,
+        .bento-card.accent .bento-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .bento-card h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+        }
+
+        .bento-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(224, 242, 254, 0.85) 100%);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .how-it-works::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .how-it-works>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .steps-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .steps-line {
+            position: absolute;
+            top: 50px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--success), var(--primary));
+            border-radius: 2px;
+            z-index: 0;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            padding: 0 1rem;
+        }
+
+        .step-number {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.4s;
+        }
+
+        .step-number::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            z-index: -1;
+        }
+
+        .step:hover .step-number {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .step h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .step p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            max-width: 200px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(14, 165, 233, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .cta h2 span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 6rem 0;
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.92) 0%, rgba(224, 242, 254, 0.88) 50%, rgba(221, 214, 254, 0.85) 100%);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .testimonials::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 10% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .testimonials>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonials .section-header {
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .testimonials-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll 60s linear infinite;
+            width: max-content;
+        }
+
+        .testimonials-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .testimonial-card {
+            flex-shrink: 0;
+            width: 350px;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-light);
+        }
+
+        .testimonial-info h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .testimonial-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .testimonial-stars {
+            color: #fbbf24;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            color: var(--dark);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .testimonial-text::before {
+            content: '"';
+            font-size: 2rem;
+            color: var(--primary);
+            font-weight: 800;
+            line-height: 0;
+            vertical-align: -0.5rem;
+            margin-right: 0.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.85rem;
+        }
+
+        /* Mobile Menu Button */
+        .hamburger {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.75rem;
+            }
+
+            .hero-text p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-image {
+                display: none;
+            }
+
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .bento-card.featured {
+                grid-column: span 2;
+            }
+
+            .steps {
+                flex-direction: column;
+                gap: 3rem;
+            }
+
+            .steps-line {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 23, 42, 0.98);
+                backdrop-filter: blur(20px);
+                padding: 1rem 2rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 0;
+            }
+
+            .nav.open {
+                display: flex;
+            }
+
+            .nav a {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .hamburger {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                cursor: pointer;
+                padding: 8px;
+                z-index: 10;
+            }
+
+            .hamburger span {
+                width: 24px;
+                height: 2px;
+                background: #e2e8f0;
+                border-radius: 2px;
+                transition: transform 0.3s, opacity 0.3s;
+            }
+
+            .hamburger.open span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.open span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.open span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            .header-content {
+                position: relative;
+            }
+
+            .mobile-menu-btn {
+                display: none;
+            }
+
+            .hero-text h1 {
+                font-size: 2.25rem;
+            }
+
+            .section-header h2,
+            .cta h2 {
+                font-size: 2rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-card.featured {
+                grid-column: span 1;
+            }
+        }
+
+        /* Onboarding Tutorial Section */
+        .onboarding {
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.97) 0%, rgba(30, 41, 59, 0.95) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .onboarding::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .onboarding>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .onboarding .section-header h2 {
+            color: white;
+        }
+
+        .onboarding .section-header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .onboarding-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .onboarding-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .onboarding-step {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .onboarding-step:nth-child(even) {
+            direction: rtl;
+        }
+
+        .onboarding-step:nth-child(even)>* {
+            direction: ltr;
+        }
+
+        .onboarding-step-content {
+            padding: 2rem 0;
+        }
+
+        .onboarding-step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .onboarding-step-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .onboarding-step-desc {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .onboarding-tips {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .onboarding-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .onboarding-tip-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--success);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .onboarding-step-visual {
+            position: relative;
+        }
+
+        .onboarding-screenshot {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            transition: transform 0.4s, box-shadow 0.4s;
+        }
+
+        .onboarding-screenshot:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow:
+                0 40px 80px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(14, 165, 233, 0.15);
+        }
+
+        .screenshot-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .screenshot-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .screenshot-dot.red {
+            background: #ef4444;
+        }
+
+        .screenshot-dot.yellow {
+            background: #eab308;
+        }
+
+        .screenshot-dot.green {
+            background: #22c55e;
+        }
+
+        .screenshot-title {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .screenshot-content {
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Mock UI Elements */
+        .mock-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .mock-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mock-input.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+        }
+
+        .mock-input-placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .mock-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .mock-tag {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .mock-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .mock-calendar-day {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .mock-calendar-day.header {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .mock-calendar-day.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .mock-calendar-day.weekend {
+            background: rgba(239, 68, 68, 0.15);
+            color: rgba(239, 68, 68, 0.8);
+        }
+
+        .mock-condition-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .mock-condition-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+        }
+
+        .mock-condition-parsed {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+
+        .mock-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .mock-stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .mock-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mock-stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.25rem;
+        }
+
+        .mock-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .mock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+
+        .mock-export-options {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .mock-export-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .mock-export-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+        }
+
+        .mock-export-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mock-export-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* Floating elements */
+        .onboarding-float {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .onboarding-float-1 {
+            top: 10%;
+            right: 5%;
+            font-size: 3rem;
+            animation: floatSlow 6s ease-in-out infinite;
+        }
+
+        .onboarding-float-2 {
+            bottom: 15%;
+            left: 3%;
+            font-size: 2.5rem;
+            animation: floatSlow 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatSlow {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .onboarding-step {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .onboarding-step:nth-child(even) {
+                direction: ltr;
+            }
+
+            .onboarding-step-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .onboarding {
+                padding: 4rem 1.5rem;
+            }
+
+            .onboarding-steps {
+                gap: 3rem;
+            }
+
+            .screenshot-content {
+                min-height: 220px;
+            }
+
+            .mock-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animated">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>Shifter</span></div>
+            </a>
+            <div class="hamburger" id="hamburger"
+                onclick="document.getElementById('hamburger').classList.toggle('open');document.getElementById('mainNav').classList.toggle('open');">
+                <span></span><span></span><span></span>
+            </div>
+            <nav class="nav" id="mainNav">
+                <a href="/">Ana Sayfa</a>
+                <a href="#features">Özellikler</a>
+                <a href="/pricing">Fiyatlandırma</a>
+                <a href="/contact">İletişim</a>
+                <a href="/support">Destek</a>
+                <a href="/login" id="loginNavBtn" class="btn-login-nav">Giriş</a>
+                <div id="userNavProfile" class="user-nav-profile" style="display: none;">
+                    <a href="/profile.html" class="user-nav-badge">
+                        <span class="user-nav-avatar" id="userNavAvatar">👤</span>
+                        <span class="user-nav-name" id="userNavName">Kullanıcı</span>
+                    </a>
+                    <button onclick="logoutUser()" class="btn-logout-nav">Çıkış</button>
+                </div>
+                <a href="/app" class="btn-cta app-link">Uygulamaya Git</a>
+            </nav>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Vardiya Planlama<br><span class="gradient">Artık Çocuk Oyuncağı</span></h1>
+                <p>Sağlık profesyonelleri için tasarlandı. Dakikalar içinde aylık program oluşturun, akıllı koşullarla
+                    optimize edin.</p>
+                <div class="hero-buttons">
+                    <a href="/app" class="btn btn-primary app-link">🚀 Hemen Başla</a>
+                    <a href="#how-it-works" class="btn btn-glass">Nasıl Çalışır?</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">%100</div>
+                        <div class="stat-label">Ücretsiz</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Kayıt Gereksinimi</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">∞</div>
+                        <div class="stat-label">Sınırsız Kullanım</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="assets/hero.png" alt="Med Shifter - Vardiya Planlama">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Features - Bento Grid -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Neden Med Shifter?</h2>
+            <p>Modern sağlık kurumları için tasarlanmış, güçlü ve kullanımı kolay</p>
+        </div>
+        <div class="bento-grid">
+            <div class="bento-card featured">
+                <div class="bento-icon">⚡</div>
+                <h3>Saniyeler İçinde Program Oluştur</h3>
+                <p>Otomatik dağılım algoritması ile personeli çalışma alanlarına adil şekilde yerleştirir. Manuel uğraş
+                    yok, sadece tek tık.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">📊</div>
+                <h3>Adil Dağılım</h3>
+                <p>İş yükünü eşit dağıtır, gerçek zamanlı istatistiklerle takip edersiniz.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">🎯</div>
+                <h3>Akıllı Koşullar</h3>
+                <p>"Ayşe Cuma çalışmasın" gibi doğal dilde kurallar yazın. Sistem anlar ve uygular.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">📤</div>
+                <h3>Kolay Paylaşım</h3>
+                <p>Programı anında yazdırın veya PDF olarak kaydedin.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon">💾</div>
+                <h3>Versiyon Kontrolü</h3>
+                <p>Farklı senaryolar kaydedin, JSON olarak dışa aktarın.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header">
+            <h2>4 Adımda Hazır</h2>
+            <p>Karmaşık süreçlere son. Basit ve hızlı.</p>
+        </div>
+        <div class="steps-container">
+            <div class="steps-line"></div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Personel Ekle</h3>
+                    <p>Çalışanların isimlerini girin</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Takvim Seç</h3>
+                    <p>Ay ve yılı belirleyin</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Koşul Yaz</h3>
+                    <p>İzin ve tercihleri ekleyin</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Paylaş</h3>
+                    <p>PDF veya yazdır</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Onboarding Tutorial Section -->
+    <section class="onboarding" id="onboarding">
+        <div class="onboarding-float onboarding-float-1">📋</div>
+        <div class="onboarding-float onboarding-float-2">✨</div>
+
+        <div class="section-header">
+            <div class="section-tag">🎓 Adım Adım Rehber</div>
+            <h2>Uygulamayı Nasıl Kullanırım?</h2>
+            <p>Görsel rehberimizle dakikalar içinde uzmanlaşın</p>
+        </div>
+
+        <div class="onboarding-container">
+            <div class="onboarding-steps">
+                <!-- Step 1: Add Staff -->
+                <div class="onboarding-step">
+                    <div class="onboarding-step-content">
+                        <div class="onboarding-step-badge">Adım 1</div>
+                        <h3 class="onboarding-step-title">Personel Listesini Oluşturun</h3>
+                        <p class="onboarding-step-desc">
+                            Çalışanlarınızın isimlerini tek tek veya toplu olarak ekleyin.
+                            Her personel için özel renkler atanır, takvimde kolayca ayırt edebilirsiniz.
+                        </p>
+                        <div class="onboarding-tips">
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>İsimleri virgülle ayırarak toplu ekleyebilirsiniz</span>
+                            </div>
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>Ekip üyelerini istediğiniz zaman düzenleyebilirsiniz</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="onboarding-step-visual">
+                        <div class="onboarding-screenshot">
+                            <div class="screenshot-header">
+                                <div class="screenshot-dot red"></div>
+                                <div class="screenshot-dot yellow"></div>
+                                <div class="screenshot-dot green"></div>
+                                <span class="screenshot-title">Personel Ekleme</span>
+                            </div>
+                            <div class="screenshot-content">
+                                <div class="mock-input-group">
+                                    <div class="mock-input active">
+                                        <span>👤</span>
+                                        <span>Dr. Ayşe Yılmaz</span>
+                                    </div>
+                                </div>
+                                <div class="mock-tags">
+                                    <div class="mock-tag">👤 Dr. Mehmet <span>×</span></div>
+                                    <div class="mock-tag">👤 Hemşire Zeynep <span>×</span></div>
+                                    <div class="mock-tag">👤 Dr. Ali <span>×</span></div>
+                                    <div class="mock-tag">👤 Hemşire Fatma <span>×</span></div>
+                                    <div class="mock-tag">👤 Dr. Can <span>×</span></div>
+                                </div>
+                                <div class="mock-btn">+ Personel Ekle</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Select Calendar -->
+                <div class="onboarding-step">
+                    <div class="onboarding-step-content">
+                        <div class="onboarding-step-badge">Adım 2</div>
+                        <h3 class="onboarding-step-title">Ay ve Çalışma Alanlarını Belirleyin</h3>
+                        <p class="onboarding-step-desc">
+                            Hangi ay için program oluşturacağınızı ve çalışma alanlarını
+                            (Poliklinik, Servis, Acil vb.) tanımlayın. Her alan için kaç kişi gerektiğini
+                            belirtebilirsiniz.
+                        </p>
+                        <div class="onboarding-tips">
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>Hafta sonları otomatik olarak işaretlenir</span>
+                            </div>
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>Resmi tatiller için özel ayarlar yapılabilir</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="onboarding-step-visual">
+                        <div class="onboarding-screenshot">
+                            <div class="screenshot-header">
+                                <div class="screenshot-dot red"></div>
+                                <div class="screenshot-dot yellow"></div>
+                                <div class="screenshot-dot green"></div>
+                                <span class="screenshot-title">Takvim Seçimi - Şubat 2026</span>
+                            </div>
+                            <div class="screenshot-content">
+                                <div class="mock-calendar">
+                                    <div class="mock-calendar-day header">Pzt</div>
+                                    <div class="mock-calendar-day header">Sal</div>
+                                    <div class="mock-calendar-day header">Çar</div>
+                                    <div class="mock-calendar-day header">Per</div>
+                                    <div class="mock-calendar-day header">Cum</div>
+                                    <div class="mock-calendar-day header">Cmt</div>
+                                    <div class="mock-calendar-day header">Paz</div>
+                                    <div class="mock-calendar-day"></div>
+                                    <div class="mock-calendar-day"></div>
+                                    <div class="mock-calendar-day"></div>
+                                    <div class="mock-calendar-day"></div>
+                                    <div class="mock-calendar-day"></div>
+                                    <div class="mock-calendar-day"></div>
+                                    <div class="mock-calendar-day weekend">1</div>
+                                    <div class="mock-calendar-day selected">2</div>
+                                    <div class="mock-calendar-day selected">3</div>
+                                    <div class="mock-calendar-day selected">4</div>
+                                    <div class="mock-calendar-day selected">5</div>
+                                    <div class="mock-calendar-day selected">6</div>
+                                    <div class="mock-calendar-day weekend">7</div>
+                                    <div class="mock-calendar-day weekend">8</div>
+                                    <div class="mock-calendar-day">9</div>
+                                    <div class="mock-calendar-day">10</div>
+                                    <div class="mock-calendar-day">11</div>
+                                    <div class="mock-calendar-day">12</div>
+                                    <div class="mock-calendar-day">13</div>
+                                    <div class="mock-calendar-day weekend">14</div>
+                                    <div class="mock-calendar-day weekend">15</div>
+                                </div>
+                                <div class="mock-tags" style="margin-top: 1rem;">
+                                    <div class="mock-tag">🏥 Poliklinik</div>
+                                    <div class="mock-tag">🛏️ Servis</div>
+                                    <div class="mock-tag">🚨 Acil</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Add Conditions -->
+                <div class="onboarding-step">
+                    <div class="onboarding-step-content">
+                        <div class="onboarding-step-badge">Adım 3</div>
+                        <h3 class="onboarding-step-title">Koşulları Doğal Dilde Yazın</h3>
+                        <p class="onboarding-step-desc">
+                            İzin, tercih ve kısıtlamaları Türkçe olarak yazın.
+                            Yapay zeka koşullarınızı anlayarak otomatik olarak takvime uygular.
+                        </p>
+                        <div class="onboarding-tips">
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>"Ayşe 5-10 Şubat izinli" gibi basit cümleler yazın</span>
+                            </div>
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>"Mehmet sadece Pazartesi çalışsın" gibi tercihler belirtin</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="onboarding-step-visual">
+                        <div class="onboarding-screenshot">
+                            <div class="screenshot-header">
+                                <div class="screenshot-dot red"></div>
+                                <div class="screenshot-dot yellow"></div>
+                                <div class="screenshot-dot green"></div>
+                                <span class="screenshot-title">Akıllı Koşullar</span>
+                            </div>
+                            <div class="screenshot-content">
+                                <div class="mock-condition-card">
+                                    <div class="mock-condition-text">"Dr. Ayşe Cuma günleri çalışmasın"</div>
+                                    <div class="mock-condition-parsed">
+                                        <span>✓</span> Koşul anlaşıldı: Cuma günleri hariç tutuldu
+                                    </div>
+                                </div>
+                                <div class="mock-condition-card">
+                                    <div class="mock-condition-text">"Hemşire Zeynep 10-15 Şubat arası izinli"</div>
+                                    <div class="mock-condition-parsed">
+                                        <span>✓</span> 6 gün izin olarak işaretlendi
+                                    </div>
+                                </div>
+                                <div class="mock-condition-card">
+                                    <div class="mock-condition-text">"Ali ile Can aynı gün nöbete girmesin"</div>
+                                    <div class="mock-condition-parsed">
+                                        <span>✓</span> Çakışma kuralı uygulandı
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Generate & Export -->
+                <div class="onboarding-step">
+                    <div class="onboarding-step-content">
+                        <div class="onboarding-step-badge">Adım 4</div>
+                        <h3 class="onboarding-step-title">Oluştur, Kontrol Et ve Paylaş</h3>
+                        <p class="onboarding-step-desc">
+                            Tek tıkla programı oluşturun. Adil dağılım istatistiklerini kontrol edin,
+                            beğenmezseniz yeniden oluşturun. Hazır olduğunda PDF veya Excel olarak dışa aktarın.
+                        </p>
+                        <div class="onboarding-tips">
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>Gerçek zamanlı istatistiklerle adil dağılımı görün</span>
+                            </div>
+                            <div class="onboarding-tip">
+                                <div class="onboarding-tip-icon">✓</div>
+                                <span>Farklı versiyonları kaydedin ve karşılaştırın</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="onboarding-step-visual">
+                        <div class="onboarding-screenshot">
+                            <div class="screenshot-header">
+                                <div class="screenshot-dot red"></div>
+                                <div class="screenshot-dot yellow"></div>
+                                <div class="screenshot-dot green"></div>
+                                <span class="screenshot-title">Program Hazır!</span>
+                            </div>
+                            <div class="screenshot-content">
+                                <div class="mock-stats-grid">
+                                    <div class="mock-stat-card">
+                                        <div class="mock-stat-value">28</div>
+                                        <div class="mock-stat-label">Toplam Gün</div>
+                                    </div>
+                                    <div class="mock-stat-card">
+                                        <div class="mock-stat-value">5</div>
+                                        <div class="mock-stat-label">Personel</div>
+                                    </div>
+                                    <div class="mock-stat-card">
+                                        <div class="mock-stat-value">%98</div>
+                                        <div class="mock-stat-label">Dağılım Skoru</div>
+                                    </div>
+                                </div>
+                                <div class="mock-export-options">
+                                    <div class="mock-export-btn">
+                                        <div class="mock-export-icon">📄</div>
+                                        <div class="mock-export-label">PDF İndir</div>
+                                    </div>
+                                    <div class="mock-export-btn">
+                                        <div class="mock-export-icon">📊</div>
+                                        <div class="mock-export-label">Excel İndir</div>
+                                    </div>
+                                    <div class="mock-export-btn">
+                                        <div class="mock-export-icon">🖨️</div>
+                                        <div class="mock-export-label">Yazdır</div>
+                                    </div>
+                                </div>
+                                <div class="mock-btn">🎯 Takvimi Oluştur</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Hemen <span>Başlayın</span></h2>
+            <p>Kayıt yok, kurulum yok, ücret yok. Sadece açın ve kullanın.</p>
+            <a href="/app" class="btn btn-primary app-link">🚀 Uygulamaya Git</a>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="section-header">
+            <div class="section-tag">💬 Yorumlar</div>
+            <h2>Bizimle Çalışanların Yorumları</h2>
+            <p>Sağlık profesyonellerinden geri bildirimler</p>
+        </div>
+        <div class="testimonials-track">
+            <!-- Testimonial 1 -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Ayşe" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Ayşe</h4>
+                        <p>Doktor</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Artık vardiya programını hazırlamak için saatler harcamıyorum. Tek tıkla her
+                    şey hazır!</p>
+            </div>
+            <!-- Testimonial 2 -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Mehmet" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Mehmet</h4>
+                        <p>Yönetici</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">50 kişilik ekibimizin programını 5 dakikada çıkarıyoruz. Ekip çok memnun.
+                </p>
+            </div>
+            <!-- Testimonial 3 -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=25" alt="Zeynep" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Zeynep</h4>
+                        <p>Hemşire</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Koşul yazma özelliği harika! İzin günlerini tek satırda belirtebiliyorum.
+                </p>
+            </div>
+            <!-- Testimonial 4 -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=53" alt="Ali" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Ali</h4>
+                        <p>Yönetici</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Versiyon kontrolü sayesinde farklı senaryoları karşılaştırabiliyorum. Çok
+                    pratik!</p>
+            </div>
+            <!-- Testimonial 5 -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=44" alt="Fatma" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Fatma</h4>
+                        <p>Hemşire</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Nöbet ertesi takibi otomatik yapılıyor. Artık kimse yorgun çalışmıyor.</p>
+            </div>
+            <!-- Testimonial 6 -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=60" alt="Can" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Can</h4>
+                        <p>Doktor</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Ücretsiz ve kayıt gerektirmemesi büyük avantaj. Hemen kullanmaya başladık.
+                </p>
+            </div>
+            <!-- Duplicate for infinite scroll -->
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Ayşe" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Ayşe</h4>
+                        <p>Doktor</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Artık vardiya programını hazırlamak için saatler harcamıyorum. Tek tıkla her
+                    şey hazır!</p>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Mehmet" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Mehmet</h4>
+                        <p>Yönetici</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">50 kişilik ekibimizin programını 5 dakikada çıkarıyoruz. Ekip çok memnun.
+                </p>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=25" alt="Zeynep" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Zeynep</h4>
+                        <p>Hemşire</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Koşul yazma özelliği harika! İzin günlerini tek satırda belirtebiliyorum.
+                </p>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=53" alt="Ali" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Ali</h4>
+                        <p>Yönetici</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Versiyon kontrolü sayesinde farklı senaryoları karşılaştırabiliyorum. Çok
+                    pratik!</p>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=44" alt="Fatma" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Fatma</h4>
+                        <p>Hemşire</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Nöbet ertesi takibi otomatik yapılıyor. Artık kimse yorgun çalışmıyor.</p>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <img src="https://i.pravatar.cc/150?img=60" alt="Can" class="testimonial-avatar">
+                    <div class="testimonial-info">
+                        <h4>Can</h4>
+                        <p>Doktor</p>
+                    </div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Ücretsiz ve kayıt gerektirmemesi büyük avantaj. Hemen kullanmaya başladık.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/">Ana Sayfa</a>
+                <a href="/app">Uygulama</a>
+                <a href="/support">Destek</a>
+                <a href="/privacy">Gizlilik</a>
+                <a href="/terms">Kullanım Koşulları</a>
+            </div>
+            <p class="footer-copyright">© 2026 Med Shifter. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js?v=2.0.2"></script>
+    <script>
+        const supabaseClient = window.supabase.createClient(
+            window.AppConfig.SUPABASE_URL,
+            window.AppConfig.SUPABASE_ANON_KEY
+        );
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu
+        function toggleMobileMenu() {
+            const nav = document.querySelector('.nav');
+            if (nav.style.display === 'flex') {
+                nav.style.display = 'none';
+            } else {
+                nav.style.display = 'flex';
+                nav.style.position = 'fixed';
+                nav.style.top = '80px';
+                nav.style.left = '1rem';
+                nav.style.right = '1rem';
+                nav.style.background = 'rgba(15, 23, 42, 0.98)';
+                nav.style.backdropFilter = 'blur(20px)';
+                nav.style.flexDirection = 'column';
+                nav.style.padding = '1.5rem';
+                nav.style.borderRadius = '16px';
+                nav.style.gap = '1rem';
+                nav.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.3)';
+            }
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Auth check for app links - redirect guests to login (Supabase session based)
+        document.querySelectorAll('.app-link').forEach(link => {
+            link.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    window.location.href = '/app';
+                } else {
+                    window.location.href = '/login.html?redirect=app&message=auth_required';
+                }
+            });
+        });
+
+        // Update header based on login status (Supabase session)
+        async function updateHeaderAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const loginBtn = document.getElementById('loginNavBtn');
+            const userProfile = document.getElementById('userNavProfile');
+            const userNavName = document.getElementById('userNavName');
+            const userNavAvatar = document.getElementById('userNavAvatar');
+
+            if (session && session.user && loginBtn && userProfile) {
+                const user = session.user;
+                const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
+                loginBtn.style.display = 'none';
+                userProfile.style.display = 'flex';
+                if (userNavName) userNavName.textContent = name;
+                if (userNavAvatar) userNavAvatar.textContent = name[0].toUpperCase();
+            }
+        }
+
+        async function logoutUser() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', updateHeaderAuth);
+    </script>
+</body>
+
+</html>

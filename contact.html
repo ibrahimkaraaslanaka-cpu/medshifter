@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - İletişim</title>
+    <meta name="description"
+        content="Med Shifter ile iletişime geçin. Sorularınız, önerileriniz ve destek talepleriniz için buradayız.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --error: #ef4444;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 50%, #1a1a2e 100%);
+            z-index: -2;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            top: -100px;
+            right: -100px;
+        }
+
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        /* Header */
+        .header {
+            padding: 1.5rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: white;
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-login-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main */
+        .main {
+            padding: 8rem 2rem 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-title span {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+        }
+
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Contact Info */
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(14, 165, 233, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .contact-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-value {
+            font-weight: 500;
+        }
+
+        .contact-value a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .contact-value a:hover {
+            text-decoration: underline;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 3rem;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .faq-question:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .faq-icon {
+            font-size: 1.25rem;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+        }
+
+        .faq-answer-content {
+            padding: 0 1.25rem 1.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.85rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 23, 42, 0.98);
+                backdrop-filter: blur(20px);
+                padding: 1rem 2rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 0;
+            }
+
+            .nav.open {
+                display: flex;
+            }
+
+            .nav a {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .hamburger {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                cursor: pointer;
+                padding: 8px;
+                z-index: 10;
+            }
+
+            .hamburger span {
+                width: 24px;
+                height: 2px;
+                background: #e2e8f0;
+                border-radius: 2px;
+                transition: transform 0.3s, opacity 0.3s;
+            }
+
+            .hamburger.open span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.open span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.open span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            .header-content {
+                position: relative;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        .hamburger {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>Shifter</span></div>
+            </a>
+            <div class="hamburger" id="hamburger"
+                onclick="document.getElementById('hamburger').classList.toggle('open');document.getElementById('mainNav').classList.toggle('open');">
+                <span></span><span></span><span></span>
+            </div>
+            <nav class="nav" id="mainNav">
+                <a href="/">Ana Sayfa</a>
+                <a href="/pricing">Fiyatlandırma</a>
+                <a href="/contact" class="active">İletişim</a>
+                <a href="/support">Destek</a>
+                <a href="/login" class="btn-login-nav">Giriş</a>
+                <a href="/app" class="btn-cta app-link">Uygulamaya Git</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-header">
+            <h1 class="page-title">Bizimle <span>İletişime</span> Geçin</h1>
+            <p class="page-subtitle">Sorularınız, önerileriniz ve destek talepleriniz için buradayız</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Contact Info -->
+            <div class="card">
+                <h2 class="card-title">📍 İletişim Bilgileri</h2>
+
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">
+                            <a href="mailto:destek@medshifter.com">destek@medshifter.com</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">💬</div>
+                    <div>
+                        <div class="contact-label">Canlı Destek</div>
+                        <div class="contact-value">Pazartesi - Cuma, 09:00 - 18:00</div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">⏱️</div>
+                    <div>
+                        <div class="contact-label">Yanıt Süresi</div>
+                        <div class="contact-value">24 saat içinde yanıt</div>
+                    </div>
+                </div>
+
+                <div class="social-links">
+                    <a href="#" class="social-link" title="Twitter">𝕏</a>
+                    <a href="#" class="social-link" title="LinkedIn">in</a>
+                    <a href="#" class="social-link" title="Instagram">📷</a>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="card">
+                <h2 class="card-title">✉️ Mesaj Gönderin</h2>
+
+                <div id="formMessage" class="message"></div>
+
+                <form id="contactForm" onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label class="form-label">Adınız</label>
+                        <input type="text" class="form-input" id="name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="email" placeholder="ornek@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Konu</label>
+                        <input type="text" class="form-input" id="subject" placeholder="Nasıl yardımcı olabiliriz?">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mesajınız</label>
+                        <textarea class="form-textarea" id="message" placeholder="Mesajınızı buraya yazın..."
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Gönder
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <div class="card">
+                <h2 class="card-title">❓ Sıkça Sorulan Sorular</h2>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Med Shifter ücretsiz mi?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Evet! Ücretsiz plan ile aylık 1 takvim oluşturabilir, 5 personel ekleyebilir ve temel
+                            özellikleri kullanabilirsiniz. Daha fazla özellik için Bireysel veya Business planlarımıza
+                            göz atabilirsiniz.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Verilerim güvende mi?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Kesinlikle! Tüm verileriniz şifrelenmiş şekilde saklanır. Ayrıca giriş yapmadan da
+                            uygulamayı kullanabilirsiniz - bu durumda veriler sadece tarayıcınızda kalır.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Planımı nasıl yükseltebilirim?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Fiyatlandırma sayfasından istediğiniz planı seçebilirsiniz. Ödeme işlemi tamamlandıktan
+                            sonra yeni özellikleriniz anında aktif olur.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Mobil cihazlarda çalışır mı?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Evet! Med Shifter tam responsive tasarıma sahiptir. Telefon, tablet veya bilgisayarınızdan
+                            sorunsuz kullanabilirsiniz.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Takvimlerimi nasıl paylaşabilirim?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Oluşturduğunuz takvimleri PDF olarak indirebilir, doğrudan yazdırabilir veya Excel
+                            formatında dışa aktarabilirsiniz.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/">Ana Sayfa</a>
+                <a href="/app">Uygulama</a>
+                <a href="/pricing">Fiyatlandırma</a>
+                <a href="/support">Destek</a>
+            </div>
+            <p class="footer-copyright">© 2026 Med Shifter. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js?v=2.0.2"></script>
+    <script>
+        const supabaseClient = window.supabase.createClient(
+            window.AppConfig.SUPABASE_URL,
+            window.AppConfig.SUPABASE_ANON_KEY
+        );
+
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('open');
+        }
+
+        function showMessage(type, text) {
+            const msgEl = document.getElementById('formMessage');
+            msgEl.className = 'message ' + type;
+            msgEl.textContent = text;
+            msgEl.style.display = 'block';
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Gönderiliyor...';
+
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+
+            // Simulate sending (in production, this would be an API call)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // For now, just show success
+            showMessage('success', 'Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
+            document.getElementById('contactForm').reset();
+
+            btn.disabled = false;
+            btn.textContent = 'Gönder';
+        }
+
+        // Auth check for app links - redirect guests to login (Supabase session based)
+        document.querySelectorAll('.app-link').forEach(link => {
+            link.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    window.location.href = '/app';
+                } else {
+                    window.location.href = '/login.html?redirect=app&message=auth_required';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

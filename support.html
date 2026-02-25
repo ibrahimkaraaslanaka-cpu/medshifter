@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Destek & SSS</title>
+    <meta name="description" content="Med Shifter yardım merkezi. Sık sorulan sorular ve destek.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #f0f9ff;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            background: var(--light-gray);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+            padding: 0.75rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: white;
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .btn-login-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-bottom: 3rem;
+        }
+
+        .faq-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .faq-question:hover {
+            background: var(--primary-light);
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.open .faq-question::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+            padding: 0 1.5rem 1.25rem;
+        }
+
+        .faq-answer p {
+            color: var(--gray);
+            line-height: 1.7;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .contact-section p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .contact-email:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        .hamburger {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                padding: 2rem 1rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 23, 42, 0.98);
+                backdrop-filter: blur(20px);
+                padding: 1rem 2rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 0;
+            }
+
+            .nav.open {
+                display: flex;
+            }
+
+            .nav a {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .hamburger {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                cursor: pointer;
+                padding: 8px;
+                z-index: 10;
+            }
+
+            .hamburger span {
+                width: 24px;
+                height: 2px;
+                background: #e2e8f0;
+                border-radius: 2px;
+                transition: transform 0.3s, opacity 0.3s;
+            }
+
+            .hamburger.open span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.open span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.open span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            .header-content {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <span class="logo-icon">🏥</span>
+                <span class="logo-text">Med<span>Shifter</span></span>
+            </a>
+            <div class="hamburger" id="hamburger"
+                onclick="document.getElementById('hamburger').classList.toggle('open');document.getElementById('mainNav').classList.toggle('open');">
+                <span></span><span></span><span></span>
+            </div>
+            <nav class="nav" id="mainNav">
+                <a href="/">Ana Sayfa</a>
+                <a href="/pricing">Fiyatlandırma</a>
+                <a href="/contact">İletişim</a>
+                <a href="/support" class="active">Destek</a>
+                <a href="/login" class="btn-login-nav">Giriş</a>
+                <a href="/app" class="btn-cta">Uygulama</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="page-title">
+            <h1>📚 Yardım Merkezi</h1>
+            <p>Sık sorulan sorular ve destek</p>
+        </div>
+
+        <!-- FAQ: Getting Started -->
+        <section class="faq-section">
+            <h2>🚀 Başlangıç</h2>
+
+            <div class="faq-item">
+                <button class="faq-question">Med Shifter nedir?</button>
+                <div class="faq-answer">
+                    <p>Med Shifter, hastane ve sağlık kurumları için tasarlanmış ücretsiz bir vardiya planlama
+                        uygulamasıdır. Aylık çalışma programları oluşturmanıza, personel dağılımını yönetmenize ve
+                        programları kolayca paylaşmanıza yardımcı olur.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">Hesap oluşturmam gerekiyor mu?</button>
+                <div class="faq-answer">
+                    <p>Hayır! Med Shifter tamamen tarayıcı tabanlıdır ve kayıt gerektirmez. Tüm verileriniz
+                        tarayıcınızda (localStorage) saklanır ve hiçbir sunucuya gönderilmez.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">Verilerim güvende mi?</button>
+                <div class="faq-answer">
+                    <p>Evet! Tüm veriler yalnızca kendi tarayıcınızda saklanır. Sunucularımıza hiçbir bilgi gönderilmez.
+                        İsterseniz verilerinizi JSON formatında dışa aktararak yedekleyebilirsiniz.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ: Usage -->
+        <section class="faq-section">
+            <h2>📋 Kullanım</h2>
+
+            <div class="faq-item">
+                <button class="faq-question">Program nasıl oluşturulur?</button>
+                <div class="faq-answer">
+                    <p>1. Personel isimlerini ekleyin<br>
+                        2. Ay ve yıl seçin, "Takvimi Oluştur" butonuna tıklayın<br>
+                        3. Nöbet ertesi bilgilerini girin<br>
+                        4. "Programı Başlat" butonuna tıklayarak otomatik dağılım yapın<br>
+                        5. Gerekirse manuel düzenlemeler yapın</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">Koşul nasıl yazılır?</button>
+                <div class="faq-answer">
+                    <p>Koşulları doğal dilde yazabilirsiniz. Örnekler:<br><br>
+                        • "Ayşe Cuma günleri çalışmasın"<br>
+                        • "Ali 05.02.2026 tarihinde çalışmasın"<br>
+                        • "Mehmet ve Zeynep aynı gün çalışmasın"<br>
+                        • "Erdem sadece Pazartesi ve Salı çalışabilir"<br>
+                        • "Fatma 10.02.2026 - 14.02.2026 arası izinli"</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">Programı nasıl paylaşırım?</button>
+                <div class="faq-answer">
+                    <p>"Paylaş / Yazdır" butonuna tıklayarak yeni bir sekmede temiz bir tablo görünümü açılır. Bu
+                        sayfanın ekran görüntüsünü alabilir veya Ctrl+P (Mac'te Cmd+P) ile PDF olarak kaydedebilirsiniz.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ: Technical -->
+        <section class="faq-section">
+            <h2>⚙️ Teknik</h2>
+
+            <div class="faq-item">
+                <button class="faq-question">Verilerimi kaybettim, geri getirebilir misiniz?</button>
+                <div class="faq-answer">
+                    <p>Maalesef hayır. Veriler yalnızca tarayıcınızda saklandığından, sunucularımızda herhangi bir
+                        yedeğimiz bulunmamaktadır. Önemli programlarınızı "Versiyonları Dışa Aktar" özelliği ile JSON
+                        olarak yedeklemenizi öneririz.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">Farklı bir cihazda kullanabilir miyim?</button>
+                <div class="faq-answer">
+                    <p>Evet! "Versiyonları Dışa Aktar" ile verilerinizi JSON olarak indirin, ardından diğer cihazda
+                        "Versiyonları İçe Aktar" ile yükleyin.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2>📧 Bize Ulaşın</h2>
+            <p>Sorularınız mı var? Yardıma mı ihtiyacınız var? Bize yazın!</p>
+            <a href="mailto:destek@medshifter.com" class="contact-email">
+                ✉️ destek@medshifter.com
+            </a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 Med Shifter. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script>
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const isOpen = item.classList.contains('open');
+
+                // Close all items
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+                // Open clicked item if it wasn't open
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  INDIVIDUAL
+  BUSINESS
+}
+
+model User {
+  id                      String     @id @default(uuid())
+  email                   String     @unique
+  passwordHash            String?    @map("password_hash")
+  googleId                String?    @unique @map("google_id")
+  name                    String?
+  avatar                  String?
+  plan                    Plan       @default(FREE)
+  planExpiresAt           DateTime?  @map("plan_expires_at")
+  calendarsUsedThisMonth  Int        @default(0) @map("calendars_used_this_month")
+  savesUsedThisMonth      Int        @default(0) @map("saves_used_this_month")
+  exportsUsedThisMonth    Int        @default(0) @map("exports_used_this_month")
+  usageResetAt            DateTime   @default(now()) @map("usage_reset_at")
+  createdAt               DateTime   @default(now()) @map("created_at")
+  updatedAt               DateTime   @updatedAt @map("updated_at")
+  
+  calendars Calendar[]
+  
+  @@map("users")
+}
+
+model Calendar {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  title       String
+  month       Int
+  year        Int
+  people      Json      @default("[]")
+  workAreas   Json      @default("[]") @map("work_areas")
+  schedule    Json      @default("[]")
+  conditions  String?
+  shiftDelays Json      @default("{}") @map("shift_delays")
+  shareToken  String?   @unique @map("share_token")
+  isPublic    Boolean   @default(false) @map("is_public")
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([shareToken])
+  @@map("calendars")
+}
+
+model Admin {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  passwordHash String    @map("password_hash")
+  name         String?
+  role         String    @default("admin") // admin, superadmin
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  @@map("admins")
+}

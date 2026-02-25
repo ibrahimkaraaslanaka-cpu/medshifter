@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Çalışma Programı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            padding: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.25rem;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: #64748b;
+        }
+
+        .header .date-info {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.6rem 0.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            white-space: nowrap;
+        }
+
+        th:first-child {
+            border-radius: 6px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 6px 0 0;
+        }
+
+        td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tr:hover {
+            background: #eff6ff;
+        }
+
+        .day-cell {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .date-cell {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .person-cell {
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .person-cell.empty {
+            color: #cbd5e1;
+            font-style: italic;
+        }
+
+        .nobetci-cell {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .week-divider td {
+            border-top: 2px solid #3b82f6;
+        }
+
+        .footer {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .error {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #ef4444;
+        }
+
+        .actions {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        /* Dynamic font sizing based on work areas */
+        .font-large td,
+        .font-large th {
+            font-size: 0.9rem;
+            padding: 0.6rem;
+        }
+
+        .font-medium td,
+        .font-medium th {
+            font-size: 0.8rem;
+            padding: 0.5rem;
+        }
+
+        .font-small td,
+        .font-small th {
+            font-size: 0.7rem;
+            padding: 0.4rem;
+        }
+
+        .font-tiny td,
+        .font-tiny th {
+            font-size: 0.6rem;
+            padding: 0.3rem;
+        }
+
+        @media print {
+            body {
+                padding: 0.5rem;
+            }
+
+            .actions {
+                display: none !important;
+            }
+
+            @page {
+                size: landscape;
+                margin: 0.5cm;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Med Shifter</h1>
+            <p class="subtitle" id="scheduleTitle">Çalışma Programı</p>
+            <p class="date-info" id="dateInfo"></p>
+        </div>
+
+        <div class="actions" id="actions" style="display: none;">
+            <button class="btn" onclick="window.print()">🖨️ Yazdır</button>
+            <button class="btn btn-success" onclick="downloadScreenshot()">📸 Ekran Görüntüsü</button>
+            <button class="btn btn-secondary" onclick="downloadPDF()">📄 PDF İndir</button>
+        </div>
+
+        <div class="table-container" id="tableContainer">
+            <div class="loading">Yükleniyor...</div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Med Shifter. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+
+    <!-- html2canvas for screenshot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        const API_URL = window.AppConfig?.API_URL || 'https://medshifter.app/api';
+        let calendarData = null;
+
+        async function loadCalendar() {
+            // Check for URL hash-based data (local share link)
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#data=')) {
+                try {
+                    const compressed = hash.substring(6); // Remove '#data='
+                    const jsonStr = decodeURIComponent(escape(atob(compressed)));
+                    const shareData = JSON.parse(jsonStr);
+
+                    // Convert compact format back to calendar format
+                    const workAreas = shareData.w || [];
+                    const schedule = (shareData.s || []).map(d => {
+                        const day = {
+                            dayName: d.dn,
+                            date: d.dt,
+                            nobetErtesi: d.ne || ''
+                        };
+                        workAreas.forEach(area => {
+                            day[`workArea${area.id}`] = d[`a${area.id}`] || '';
+                        });
+                        return day;
+                    });
+
+                    calendarData = {
+                        title: shareData.t,
+                        month: shareData.m,
+                        year: shareData.y,
+                        people: shareData.p,
+                        workAreas: workAreas,
+                        schedule: schedule,
+                        showNobetErtesi: shareData.ne
+                    };
+
+                    renderCalendar(calendarData);
+                    document.getElementById('actions').style.display = 'flex';
+                    return;
+                } catch (error) {
+                    console.error('Hash data decode error:', error);
+                    showError('Paylaşım linki geçersiz veya bozuk');
+                    return;
+                }
+            }
+
+            // Original: API-based loading for /view/:token URLs
+            const pathParts = window.location.pathname.split('/');
+            const token = pathParts[pathParts.length - 1];
+
+            if (!token || token === 'view' || token === 'view.html') {
+                showError('Geçersiz paylaşım linki');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/public/${token}`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showError('Bu takvim bulunamadı veya paylaşımda değil');
+                    } else {
+                        showError('Takvim yüklenemedi');
+                    }
+                    return;
+                }
+
+                const data = await response.json();
+                calendarData = data.calendar;
+                renderCalendar(calendarData);
+                document.getElementById('actions').style.display = 'flex';
+            } catch (error) {
+                console.error('Load error:', error);
+                showError('Bağlantı hatası');
+            }
+        }
+
+        function showError(message) {
+            const container = document.getElementById('tableContainer');
+            container.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'error';
+            const h2 = document.createElement('h2');
+            h2.textContent = '⚠️ Hata';
+            const p = document.createElement('p');
+            p.textContent = message;
+            div.appendChild(h2);
+            div.appendChild(p);
+            container.appendChild(div);
+        }
+
+        function renderCalendar(cal) {
+            const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+            // Set title
+            document.getElementById('scheduleTitle').textContent = cal.title || `${monthNames[cal.month]} ${cal.year} Çalışma Programı`;
+
+            // Set date info
+            if (cal.publishedAt) {
+                const pubDate = new Date(cal.publishedAt);
+                document.getElementById('dateInfo').textContent = `Paylaşım: ${pubDate.toLocaleDateString('tr-TR')}`;
+            }
+
+            const workAreas = cal.workAreas || [];
+            const schedule = cal.schedule || [];
+
+            // Check if any day has nobetErtesi data
+            const hasNobetErtesi = schedule.some(day => day.nobetErtesi && day.nobetErtesi.trim() !== '');
+
+            // Determine font size based on work area count
+            let fontClass = 'font-large';
+            if (workAreas.length > 10) fontClass = 'font-tiny';
+            else if (workAreas.length > 7) fontClass = 'font-small';
+            else if (workAreas.length > 4) fontClass = 'font-medium';
+
+            // Helper to escape HTML entities
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            let html = `<table class="${fontClass}">`;
+
+            // Header
+            html += '<thead><tr>';
+            html += '<th>Gün</th>';
+            html += '<th>Tarih</th>';
+            workAreas.forEach(area => {
+                html += `<th>${escapeHtml(area.name)}</th>`;
+            });
+            if (hasNobetErtesi) {
+                html += '<th>Nöbet Ertesi</th>';
+            }
+            html += '</tr></thead>';
+
+            // Body
+            html += '<tbody>';
+            let lastWeek = null;
+
+            schedule.forEach((day) => {
+                const date = new Date(day.date);
+                const dayName = day.dayName || '';
+                const dateStr = formatDate(date);
+
+                const weekClass = day.weekNumber !== lastWeek && lastWeek !== null ? 'week-divider' : '';
+                lastWeek = day.weekNumber;
+
+                html += `<tr class="${weekClass}">`;
+                html += `<td class="day-cell">${escapeHtml(dayName)}</td>`;
+                html += `<td class="date-cell">${dateStr}</td>`;
+
+                workAreas.forEach(area => {
+                    const person = day[`workArea${area.id}`] || '';
+                    const cellClass = person ? 'person-cell' : 'person-cell empty';
+                    html += `<td class="${cellClass}">${person ? escapeHtml(person) : '-'}</td>`;
+                });
+
+                if (hasNobetErtesi) {
+                    const nobetci = day.nobetErtesi || '';
+                    if (nobetci) {
+                        html += `<td class="nobetci-cell">${escapeHtml(nobetci)}</td>`;
+                    } else {
+                        html += '<td class="person-cell empty">-</td>';
+                    }
+                }
+
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = html;
+        }
+
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        async function downloadScreenshot() {
+            const container = document.getElementById('tableContainer');
+            const table = container.querySelector('table');
+
+            if (!table) return;
+
+            try {
+                const canvas = await html2canvas(table, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+
+                const link = document.createElement('a');
+                link.download = `${calendarData.title || 'takvim'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Screenshot error:', error);
+                alert('Ekran görüntüsü alınamadı');
+            }
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const container = document.getElementById('tableContainer');
+            const table = container.querySelector('table');
+
+            if (!table) return;
+
+            try {
+                // Capture table as canvas
+                const canvas = await html2canvas(table, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+
+                // Create PDF in landscape
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 10;
+
+                const imgWidth = pageWidth - (margin * 2);
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                // If image is taller than page, split into multiple pages
+                if (imgHeight <= pageHeight - (margin * 2)) {
+                    // Single page
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, imgWidth, imgHeight);
+                } else {
+                    // Multiple pages
+                    const pageImgHeight = pageHeight - (margin * 2);
+                    let remainingHeight = imgHeight;
+                    let srcY = 0;
+                    let pageNum = 0;
+
+                    while (remainingHeight > 0) {
+                        if (pageNum > 0) pdf.addPage();
+
+                        const sliceHeight = Math.min(pageImgHeight, remainingHeight);
+                        const srcHeight = (sliceHeight / imgHeight) * canvas.height;
+
+                        // Create a slice of the canvas
+                        const sliceCanvas = document.createElement('canvas');
+                        sliceCanvas.width = canvas.width;
+                        sliceCanvas.height = srcHeight;
+                        const ctx = sliceCanvas.getContext('2d');
+                        ctx.drawImage(canvas, 0, srcY, canvas.width, srcHeight, 0, 0, canvas.width, srcHeight);
+
+                        pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, margin, imgWidth, sliceHeight);
+
+                        srcY += srcHeight;
+                        remainingHeight -= pageImgHeight;
+                        pageNum++;
+                    }
+                }
+
+                pdf.save(`${calendarData.title || 'takvim'}.pdf`);
+            } catch (error) {
+                console.error('PDF error:', error);
+                alert('PDF oluşturulamadı');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadCalendar);
+    </script>
+</body>
+
+</html>

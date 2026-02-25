@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        /* Layout */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(30, 41, 59, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+        }
+
+        .sidebar-nav-link.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.2) 100%);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .sidebar-nav-icon {
+            font-size: 1.25rem;
+        }
+
+        .sidebar-user {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-user-name {
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-user-role {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #fca5a5;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        /* Cards */
+        .dashboard-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .data-table th {
+            color: #64748b;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info-name {
+            font-weight: 500;
+            color: #f1f5f9;
+        }
+
+        .user-info-email {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-free {
+            background: rgba(100, 116, 139, 0.2);
+            color: #94a3b8;
+        }
+
+        .badge-individual {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .badge-business {
+            background: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+        }
+
+        .badge-admin {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .badge-superadmin {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+        }
+
+        .badge-pending {
+            background: rgba(234, 179, 8, 0.2);
+            color: #fbbf24;
+        }
+
+        .badge-completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .badge-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .badge-cancelled {
+            background: rgba(100, 116, 139, 0.2);
+            color: #94a3b8;
+        }
+
+        .badge-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .badge-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .toggle-btn {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f87171;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active::after {
+            background: #4ade80;
+            left: 23px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Search */
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 0.875rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .filter-select {
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 0.875rem;
+            min-width: 150px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Page Content - Hidden by default */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* Plan Distribution */
+        .plan-distribution {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .plan-item {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .plan-item-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .plan-item-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon">🏥</span>
+                <span class="sidebar-logo-text">Med Shifter</span>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a class="sidebar-nav-link active" data-page="dashboard" onclick="showPage('dashboard')">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="sidebar-nav-link" data-page="users" onclick="showPage('users')">
+                            <span class="sidebar-nav-icon">👥</span>
+                            <span>Kullanıcılar</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="sidebar-nav-link" data-page="calendars" onclick="showPage('calendars')">
+                            <span class="sidebar-nav-icon">📅</span>
+                            <span>Takvimler</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="sidebar-nav-link" data-page="coupons" onclick="showPage('coupons')">
+                            <span class="sidebar-nav-icon">🎟️</span>
+                            <span>Kuponlar</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="sidebar-nav-link" data-page="orders" onclick="showPage('orders')">
+                            <span class="sidebar-nav-icon">💰</span>
+                            <span>Siparişler</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item" id="adminsNavItem" style="display: none;">
+                        <a class="sidebar-nav-link" data-page="admins" onclick="showPage('admins')">
+                            <span class="sidebar-nav-icon">🔐</span>
+                            <span>Yöneticiler</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="sidebar-user-name" id="adminName">Admin</div>
+                <div class="sidebar-user-role" id="adminRole">admin</div>
+                <button class="btn-logout" onclick="logout()">Çıkış Yap</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page-content active" id="page-dashboard">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Genel bakış ve istatistikler</p>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-value" id="statTotalUsers">-</div>
+                        <div class="stat-label">Toplam Kullanıcı</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value" id="statTotalCalendars">-</div>
+                        <div class="stat-label">Toplam Takvim</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-value" id="statUsersThisMonth">-</div>
+                        <div class="stat-label">Bu Ay Kayıt</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-value" id="statUsersToday">-</div>
+                        <div class="stat-label">Bugün Kayıt</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Plan Dağılımı</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="plan-distribution" id="planDistribution">
+                            <div class="plan-item">
+                                <div class="plan-item-count" id="planFree">-</div>
+                                <div class="plan-item-label">FREE</div>
+                            </div>
+                            <div class="plan-item">
+                                <div class="plan-item-count" id="planIndividual">-</div>
+                                <div class="plan-item-label">INDIVIDUAL</div>
+                            </div>
+                            <div class="plan-item">
+                                <div class="plan-item-count" id="planBusiness">-</div>
+                                <div class="plan-item-label">BUSINESS</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Son Kayıtlar</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Plan</th>
+                                    <th>Kayıt Tarihi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentUsersTable">
+                                <tr>
+                                    <td colspan="3" class="loading-spinner">Yükleniyor...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div class="page-content" id="page-users">
+                <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h1 class="page-title">Kullanıcılar</h1>
+                        <p class="page-subtitle">Tüm kullanıcıları yönetin</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCreateUserModal()">+ Yeni Kullanıcı</button>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" class="search-input" id="userSearch" placeholder="Email veya isim ile ara...">
+                    <select class="filter-select" id="planFilter">
+                        <option value="">Tüm Planlar</option>
+                        <option value="FREE">FREE</option>
+                        <option value="INDIVIDUAL">INDIVIDUAL</option>
+                        <option value="BUSINESS">BUSINESS</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadUsers()">Ara</button>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Plan</th>
+                                    <th>Takvim</th>
+                                    <th>Kayıt</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr>
+                                    <td colspan="5" class="loading-spinner">Yükleniyor...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <div class="pagination-info" id="usersPaginationInfo">-</div>
+                            <div class="pagination-buttons">
+                                <button class="btn btn-secondary btn-sm" id="usersPrevBtn"
+                                    onclick="usersPage--; loadUsers()">← Önceki</button>
+                                <button class="btn btn-secondary btn-sm" id="usersNextBtn"
+                                    onclick="usersPage++; loadUsers()">Sonraki →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendars Page -->
+            <div class="page-content" id="page-calendars">
+                <div class="page-header">
+                    <h1 class="page-title">Takvimler</h1>
+                    <p class="page-subtitle">Son oluşturulan takvimler</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Takvim</th>
+                                    <th>Kullanıcı</th>
+                                    <th>Dönem</th>
+                                    <th>Oluşturulma</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendarsTable">
+                                <tr>
+                                    <td colspan="4" class="loading-spinner">Yükleniyor...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <div class="pagination-info" id="calendarsPaginationInfo">-</div>
+                            <div class="pagination-buttons">
+                                <button class="btn btn-secondary btn-sm" id="calendarsPrevBtn"
+                                    onclick="calendarsPage--; loadCalendars()">← Önceki</button>
+                                <button class="btn btn-secondary btn-sm" id="calendarsNextBtn"
+                                    onclick="calendarsPage++; loadCalendars()">Sonraki →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admins Page -->
+            <div class="page-content" id="page-admins">
+                <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h1 class="page-title">Yöneticiler</h1>
+                        <p class="page-subtitle">Admin hesaplarını yönetin</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCreateAdminModal()">+ Yeni Admin</button>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı Adı</th>
+                                    <th>İsim</th>
+                                    <th>Rol</th>
+                                    <th>Son Giriş</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminsTable">
+                                <tr>
+                                    <td colspan="5" class="loading-spinner">Yükleniyor...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Coupons Page -->
+            <div class="page-content" id="page-coupons">
+                <div class="page-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h1 class="page-title">Kuponlar</h1>
+                        <p class="page-subtitle">İndirim kuponlarını yönetin</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCreateCouponModal()">+ Yeni Kupon</button>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kod</th>
+                                    <th>İndirim</th>
+                                    <th>Kullanım</th>
+                                    <th>Planlar</th>
+                                    <th>Geçerlilik</th>
+                                    <th>Durum</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="couponsTable">
+                                <tr>
+                                    <td colspan="7" class="loading-spinner">Yükleniyor...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Page -->
+            <div class="page-content" id="page-orders">
+                <div class="page-header">
+                    <h1 class="page-title">Siparişler</h1>
+                    <p class="page-subtitle">Sipariş geçmişi ve yönetimi</p>
+                </div>
+
+                <div class="search-box">
+                    <select class="filter-select" id="orderStatusFilter">
+                        <option value="">Tüm Durumlar</option>
+                        <option value="pending">Bekliyor</option>
+                        <option value="completed">Tamamlandı</option>
+                        <option value="failed">Başarısız</option>
+                        <option value="cancelled">İptal</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadOrders()">Filtrele</button>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Plan</th>
+                                    <th>Dönem</th>
+                                    <th>Tutar</th>
+                                    <th>Kupon</th>
+                                    <th>Durum</th>
+                                    <th>Tarih</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable">
+                                <tr>
+                                    <td colspan="8" class="loading-spinner">Yükleniyor...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <div class="pagination-info" id="ordersPaginationInfo">-</div>
+                            <div class="pagination-buttons">
+                                <button class="btn btn-secondary btn-sm" id="ordersPrevBtn"
+                                    onclick="ordersPage--; loadOrders()">← Önceki</button>
+                                <button class="btn btn-secondary btn-sm" id="ordersNextBtn"
+                                    onclick="ordersPage++; loadOrders()">Sonraki →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Kullanıcı Detayı</h3>
+                <button class="modal-close" onclick="closeModal('userModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="userModalBody">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Plan Modal -->
+    <div class="modal-overlay" id="planModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Plan Değiştir</h3>
+                <button class="modal-close" onclick="closeModal('planModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="planUserId">
+                <div class="form-group">
+                    <label class="form-label">Yeni Plan</label>
+                    <select class="form-select" id="newPlan">
+                        <option value="FREE">FREE</option>
+                        <option value="INDIVIDUAL">INDIVIDUAL</option>
+                        <option value="BUSINESS">BUSINESS</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bitiş Tarihi (Opsiyonel)</label>
+                    <input type="date" class="form-input" id="planExpiry">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('planModal')">İptal</button>
+                <button class="btn btn-primary" onclick="updateUserPlan()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Admin Modal -->
+    <div class="modal-overlay" id="createAdminModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Yeni Admin Oluştur</h3>
+                <button class="modal-close" onclick="closeModal('createAdminModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Kullanıcı Adı</label>
+                    <input type="text" class="form-input" id="newAdminUsername" placeholder="admin123">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Şifre (min 8 karakter)</label>
+                    <input type="password" class="form-input" id="newAdminPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">İsim (Opsiyonel)</label>
+                    <input type="text" class="form-input" id="newAdminName" placeholder="Admin Adı">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rol</label>
+                    <select class="form-select" id="newAdminRole">
+                        <option value="admin">Admin</option>
+                        <option value="superadmin">Superadmin</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createAdminModal')">İptal</button>
+                <button class="btn btn-primary" onclick="createAdmin()">Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Coupon Modal -->
+    <div class="modal-overlay" id="createCouponModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Yeni Kupon Oluştur</h3>
+                <button class="modal-close" onclick="closeModal('createCouponModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Kupon Kodu</label>
+                    <input type="text" class="form-input" id="newCouponCode" placeholder="MEDSHIFT50"
+                        style="text-transform: uppercase">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">İndirim Yüzdesi (%)</label>
+                    <input type="number" class="form-input" id="newCouponDiscount" min="1" max="100" placeholder="50">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Maksimum Kullanım (0 = Sınırsız)</label>
+                    <input type="number" class="form-input" id="newCouponMaxUses" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Geçerlilik Sonu (Opsiyonel)</label>
+                    <input type="date" class="form-input" id="newCouponValidUntil">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Geçerli Planlar</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="couponPlanIndividual" checked> Bireysel
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="couponPlanBusiness" checked> Business
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createCouponModal')">İptal</button>
+                <button class="btn btn-primary" onclick="createCoupon()">Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal-overlay" id="createUserModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Yeni Kullanıcı Oluştur</h3>
+                <button class="modal-close" onclick="closeModal('createUserModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">E-posta</label>
+                    <input type="email" class="form-input" id="newUserEmail" placeholder="kullanici@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Şifre</label>
+                    <input type="password" class="form-input" id="newUserPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">İsim (Opsiyonel)</label>
+                    <input type="text" class="form-input" id="newUserName" placeholder="Ad Soyad">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Plan</label>
+                    <select class="form-select" id="newUserPlan">
+                        <option value="FREE">FREE</option>
+                        <option value="INDIVIDUAL">INDIVIDUAL</option>
+                        <option value="BUSINESS">BUSINESS</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createUserModal')">İptal</button>
+                <button class="btn btn-primary" onclick="createUser()">Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js?v=2.0.2"></script>
+    <script>
+        const API_URL = window.AppConfig?.API_URL || 'http://localhost:3001/api';
+        let adminToken = localStorage.getItem('medshifter_admin_token');
+        let adminInfo = JSON.parse(localStorage.getItem('medshifter_admin') || 'null');
+        let usersPage = 1;
+        let calendarsPage = 1;
+        let ordersPage = 1;
+
+        // Auth check
+        if (!adminToken) {
+            window.location.href = '/admin-login';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (adminInfo) {
+                document.getElementById('adminName').textContent = adminInfo.name || adminInfo.username;
+                document.getElementById('adminRole').textContent = adminInfo.role;
+
+                // Show admins nav for superadmin
+                if (adminInfo.role === 'superadmin') {
+                    document.getElementById('adminsNavItem').style.display = 'block';
+                }
+            }
+            loadDashboard();
+        });
+
+        // API request helper
+        async function apiRequest(endpoint, options = {}) {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`,
+                    ...options.headers
+                }
+            });
+
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+
+            return response.json();
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('medshifter_admin_token');
+            localStorage.removeItem('medshifter_admin');
+            window.location.href = '/admin-login';
+        }
+
+        // Show page
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
+
+            // Show selected page
+            document.getElementById(`page-${pageName}`).classList.add('active');
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+
+            // Load data
+            if (pageName === 'dashboard') loadDashboard();
+            if (pageName === 'users') loadUsers();
+            if (pageName === 'calendars') loadCalendars();
+            if (pageName === 'coupons') loadCoupons();
+            if (pageName === 'orders') loadOrders();
+            if (pageName === 'admins') loadAdmins();
+        }
+
+        // Load dashboard
+        async function loadDashboard() {
+            try {
+                const data = await apiRequest('/admin/dashboard');
+
+                // Update stats
+                document.getElementById('statTotalUsers').textContent = data.stats.totalUsers;
+                document.getElementById('statTotalCalendars').textContent = data.stats.totalCalendars;
+                document.getElementById('statUsersThisMonth').textContent = data.stats.usersThisMonth;
+                document.getElementById('statUsersToday').textContent = data.stats.usersToday;
+
+                // Update plan distribution
+                document.getElementById('planFree').textContent = data.planDistribution.FREE;
+                document.getElementById('planIndividual').textContent = data.planDistribution.INDIVIDUAL;
+                document.getElementById('planBusiness').textContent = data.planDistribution.BUSINESS;
+
+                // Update recent users
+                const tbody = document.getElementById('recentUsersTable');
+                if (data.recentUsers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Henüz kullanıcı yok</td></tr>';
+                } else {
+                    tbody.innerHTML = data.recentUsers.map(user => `
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar">${user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}</div>
+                                    <div>
+                                        <div class="user-info-name">${user.name || 'İsimsiz'}</div>
+                                        <div class="user-info-email">${user.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-${user.plan.toLowerCase()}">${user.plan}</span></td>
+                            <td>${new Date(user.created_at).toLocaleDateString('tr-TR')}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            const search = document.getElementById('userSearch').value;
+            const plan = document.getElementById('planFilter').value;
+
+            try {
+                const data = await apiRequest(`/admin/users?page=${usersPage}&search=${search}&plan=${plan}`);
+
+                const tbody = document.getElementById('usersTable');
+                if (data.users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Kullanıcı bulunamadı</td></tr>';
+                } else {
+                    tbody.innerHTML = data.users.map(user => `
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar">
+                                        ${user.avatar ? `<img src="${user.avatar}" alt="">` : (user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase())}
+                                    </div>
+                                    <div>
+                                        <div class="user-info-name">${user.name || 'İsimsiz'}</div>
+                                        <div class="user-info-email">${user.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-${user.plan.toLowerCase()}">${user.plan}</span></td>
+                            <td>${user.calendars_used_this_month || 0}</td>
+                            <td>${new Date(user.created_at).toLocaleDateString('tr-TR')}</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm" onclick="showUserDetail('${user.id}')">Detay</button>
+                                <button class="btn btn-primary btn-sm" onclick="showPlanModal('${user.id}', '${user.plan}')">Plan</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Update pagination
+                document.getElementById('usersPaginationInfo').textContent =
+                    `${data.pagination.page} / ${data.pagination.totalPages} (${data.pagination.total} kullanıcı)`;
+                document.getElementById('usersPrevBtn').disabled = data.pagination.page <= 1;
+                document.getElementById('usersNextBtn').disabled = data.pagination.page >= data.pagination.totalPages;
+
+            } catch (error) {
+                console.error('Users load error:', error);
+            }
+        }
+
+        // Load calendars
+        async function loadCalendars() {
+            const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+            try {
+                const data = await apiRequest(`/admin/calendars?page=${calendarsPage}`);
+
+                const tbody = document.getElementById('calendarsTable');
+                if (data.calendars.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Henüz takvim yok</td></tr>';
+                } else {
+                    tbody.innerHTML = data.calendars.map(cal => `
+                        <tr>
+                            <td><strong>${cal.title}</strong></td>
+                            <td>
+                                <div class="user-info-name">${cal.user.name || cal.user.email}</div>
+                                <div class="user-info-email">${cal.user.email}</div>
+                            </td>
+                            <td>${monthNames[cal.month]} ${cal.year}</td>
+                            <td>${new Date(cal.created_at).toLocaleDateString('tr-TR')}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Update pagination
+                document.getElementById('calendarsPaginationInfo').textContent =
+                    `${data.pagination.page} / ${data.pagination.totalPages} (${data.pagination.total} takvim)`;
+                document.getElementById('calendarsPrevBtn').disabled = data.pagination.page <= 1;
+                document.getElementById('calendarsNextBtn').disabled = data.pagination.page >= data.pagination.totalPages;
+
+            } catch (error) {
+                console.error('Calendars load error:', error);
+            }
+        }
+
+        // Load admins
+        async function loadAdmins() {
+            try {
+                const data = await apiRequest('/admin/admins');
+
+                const tbody = document.getElementById('adminsTable');
+                if (data.admins.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Henüz admin yok</td></tr>';
+                } else {
+                    tbody.innerHTML = data.admins.map(admin => `
+                        <tr>
+                            <td><strong>${admin.username}</strong></td>
+                            <td>${admin.name || '-'}</td>
+                            <td><span class="badge badge-${admin.role}">${admin.role}</span></td>
+                            <td>${admin.last_login_at ? new Date(admin.last_login_at).toLocaleString('tr-TR') : 'Hiç'}</td>
+                            <td>
+                                ${admin.id !== adminInfo.id ? `<button class="btn btn-secondary btn-sm" onclick="deleteAdmin('${admin.id}')">Sil</button>` : '-'}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Admins load error:', error);
+            }
+        }
+
+        // Show user detail
+        async function showUserDetail(userId) {
+            try {
+                const data = await apiRequest(`/admin/users/${userId}`);
+                const user = data.user;
+                const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+                document.getElementById('userModalBody').innerHTML = `
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="user-cell" style="margin-bottom: 1rem;">
+                            <div class="user-avatar" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                                ${user.avatar ? `<img src="${user.avatar}" alt="">` : (user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase())}
+                            </div>
+                            <div>
+                                <div class="user-info-name" style="font-size: 1.125rem;">${user.name || 'İsimsiz'}</div>
+                                <div class="user-info-email">${user.email}</div>
+                            </div>
+                        </div>
+                        <span class="badge badge-${user.plan.toLowerCase()}">${user.plan}</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="plan-item">
+                            <div class="plan-item-count">${user.calendars_used_this_month}</div>
+                            <div class="plan-item-label">Takvim (Bu Ay)</div>
+                        </div>
+                        <div class="plan-item">
+                            <div class="plan-item-count">${user.saves_used_this_month}</div>
+                            <div class="plan-item-label">Kaydetme (Bu Ay)</div>
+                        </div>
+                    </div>
+                    <h4 style="margin-bottom: 1rem; color: #f1f5f9;">Takvimleri (${user.calendars.length})</h4>
+                    ${user.calendars.length === 0 ? '<p style="color: #64748b;">Henüz takvim yok</p>' : `
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Başlık</th>
+                                    <th>Dönem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${user.calendars.map(cal => `
+                                    <tr>
+                                        <td>${cal.title}</td>
+                                        <td>${monthNames[cal.month]} ${cal.year}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `}
+                `;
+                document.getElementById('userModal').classList.add('active');
+            } catch (error) {
+                console.error('User detail error:', error);
+            }
+        }
+
+        // Show plan modal
+        function showPlanModal(userId, currentPlan) {
+            document.getElementById('planUserId').value = userId;
+            document.getElementById('newPlan').value = currentPlan;
+            document.getElementById('planExpiry').value = '';
+            document.getElementById('planModal').classList.add('active');
+        }
+
+        // Update user plan
+        async function updateUserPlan() {
+            const userId = document.getElementById('planUserId').value;
+            const plan = document.getElementById('newPlan').value;
+            const expiresAt = document.getElementById('planExpiry').value;
+
+            try {
+                await apiRequest(`/admin/users/${userId}/plan`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ plan, expiresAt: expiresAt || null })
+                });
+
+                closeModal('planModal');
+                loadUsers();
+                alert('Plan güncellendi!');
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        // Show create admin modal
+        function showCreateAdminModal() {
+            document.getElementById('newAdminUsername').value = '';
+            document.getElementById('newAdminPassword').value = '';
+            document.getElementById('newAdminName').value = '';
+            document.getElementById('newAdminRole').value = 'admin';
+            document.getElementById('createAdminModal').classList.add('active');
+        }
+
+        // Create admin
+        async function createAdmin() {
+            const username = document.getElementById('newAdminUsername').value.trim();
+            const password = document.getElementById('newAdminPassword').value;
+            const name = document.getElementById('newAdminName').value.trim();
+            const role = document.getElementById('newAdminRole').value;
+
+            if (!username || !password) {
+                alert('Kullanıcı adı ve şifre gerekli');
+                return;
+            }
+
+            if (password.length < 8) {
+                alert('Şifre en az 8 karakter olmalı');
+                return;
+            }
+
+            try {
+                await apiRequest('/admin/admins', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password, name, role })
+                });
+
+                closeModal('createAdminModal');
+                loadAdmins();
+                alert('Admin oluşturuldu!');
+            } catch (error) {
+                alert('Hata: ' + (error.error || error.message));
+            }
+        }
+
+        // Delete admin
+        async function deleteAdmin(adminId) {
+            if (!confirm('Bu admini silmek istediğinizden emin misiniz?')) return;
+
+            try {
+                await apiRequest(`/admin/admins/${adminId}`, { method: 'DELETE' });
+                loadAdmins();
+                alert('Admin silindi!');
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // ========== COUPONS ==========
+
+        async function loadCoupons() {
+            try {
+                const data = await apiRequest('/admin/coupons');
+                const tbody = document.getElementById('couponsTable');
+                if (!data.coupons || data.coupons.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Henüz kupon yok</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = data.coupons.map(c => `
+                    <tr>
+                        <td><strong style="font-family: monospace; letter-spacing: 1px;">${c.code}</strong></td>
+                        <td><span class="badge badge-individual">%${c.discount_percent}</span></td>
+                        <td>${c.current_uses}${c.max_uses > 0 ? ' / ' + c.max_uses : ' / ∞'}</td>
+                        <td>${(c.applicable_plans || []).map(p => `<span class="badge badge-${p.toLowerCase()}" style="margin-right:4px">${p}</span>`).join('')}</td>
+                        <td>${c.valid_until ? new Date(c.valid_until).toLocaleDateString('tr-TR') : 'Süresiz'}</td>
+                        <td>
+                            <button class="toggle-btn ${c.is_active ? 'active' : ''}" onclick="toggleCoupon('${c.id}', ${!c.is_active})"></button>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" style="color: #f87171;" onclick="deleteCoupon('${c.id}')">Sil</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Coupons load error:', error);
+            }
+        }
+
+        function showCreateCouponModal() {
+            document.getElementById('newCouponCode').value = '';
+            document.getElementById('newCouponDiscount').value = '';
+            document.getElementById('newCouponMaxUses').value = '0';
+            document.getElementById('newCouponValidUntil').value = '';
+            document.getElementById('couponPlanIndividual').checked = true;
+            document.getElementById('couponPlanBusiness').checked = true;
+            document.getElementById('createCouponModal').classList.add('active');
+        }
+
+        async function createCoupon() {
+            const code = document.getElementById('newCouponCode').value.trim();
+            const discount_percent = parseInt(document.getElementById('newCouponDiscount').value);
+            const max_uses = parseInt(document.getElementById('newCouponMaxUses').value) || 0;
+            const valid_until = document.getElementById('newCouponValidUntil').value || null;
+            const applicable_plans = [];
+            if (document.getElementById('couponPlanIndividual').checked) applicable_plans.push('INDIVIDUAL');
+            if (document.getElementById('couponPlanBusiness').checked) applicable_plans.push('BUSINESS');
+
+            if (!code || !discount_percent) {
+                alert('Kupon kodu ve indirim yüzdesi gerekli');
+                return;
+            }
+
+            try {
+                await apiRequest('/admin/coupons', {
+                    method: 'POST',
+                    body: JSON.stringify({ code, discount_percent, max_uses, valid_until, applicable_plans })
+                });
+                closeModal('createCouponModal');
+                loadCoupons();
+                alert('Kupon oluşturuldu!');
+            } catch (error) {
+                alert('Hata: ' + (error.error || error.message));
+            }
+        }
+
+        async function toggleCoupon(couponId, newState) {
+            try {
+                await apiRequest(`/admin/coupons/${couponId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ is_active: newState })
+                });
+                loadCoupons();
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        async function deleteCoupon(couponId) {
+            if (!confirm('Bu kuponu silmek istediğinizden emin misiniz?')) return;
+            try {
+                await apiRequest(`/admin/coupons/${couponId}`, { method: 'DELETE' });
+                loadCoupons();
+                alert('Kupon silindi!');
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        // ========== ORDERS ==========
+
+        async function loadOrders() {
+            const status = document.getElementById('orderStatusFilter').value;
+            const statusLabels = { pending: 'Bekliyor', completed: 'Tamamlandı', failed: 'Başarısız', cancelled: 'İptal' };
+            const periodLabels = { monthly: 'Aylık', yearly: 'Yıllık' };
+
+            try {
+                const data = await apiRequest(`/admin/orders?page=${ordersPage}&status=${status}`);
+                const tbody = document.getElementById('ordersTable');
+                if (!data.orders || data.orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Sipariş bulunamadı</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = data.orders.map(o => `
+                    <tr>
+                        <td>
+                            <div class="user-info-name">${o.user?.name || o.user?.email || '-'}</div>
+                            <div class="user-info-email">${o.user?.email || ''}</div>
+                        </td>
+                        <td><span class="badge badge-${o.plan.toLowerCase()}">${o.plan}</span></td>
+                        <td>${periodLabels[o.billing_period] || o.billing_period}</td>
+                        <td><strong>${o.amount} ${o.currency}</strong></td>
+                        <td>${o.coupon ? `<span class="badge badge-individual">${o.coupon.code} (%${o.coupon.discount_percent})</span>` : '-'}</td>
+                        <td><span class="badge badge-${o.status}">${statusLabels[o.status] || o.status}</span></td>
+                        <td>${new Date(o.created_at).toLocaleDateString('tr-TR')}</td>
+                        <td>
+                            ${o.status === 'pending' ? `
+                                <button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${o.id}', 'completed')" style="margin-right:4px">✓ Onayla</button>
+                                <button class="btn btn-secondary btn-sm" style="color:#f87171" onclick="updateOrderStatus('${o.id}', 'cancelled')">✗ İptal</button>
+                            ` : '-'}
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Pagination
+                document.getElementById('ordersPaginationInfo').textContent =
+                    `${data.pagination.page} / ${data.pagination.totalPages} (${data.pagination.total} sipariş)`;
+                document.getElementById('ordersPrevBtn').disabled = data.pagination.page <= 1;
+                document.getElementById('ordersNextBtn').disabled = data.pagination.page >= data.pagination.totalPages;
+            } catch (error) {
+                console.error('Orders load error:', error);
+            }
+        }
+
+        async function updateOrderStatus(orderId, status) {
+            const labels = { completed: 'onaylamak', cancelled: 'iptal etmek' };
+            if (!confirm(`Bu siparişi ${labels[status]} istediğinizden emin misiniz?`)) return;
+
+            try {
+                await apiRequest(`/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status })
+                });
+                loadOrders();
+                if (status === 'completed') {
+                    alert('Sipariş onaylandı ve kullanıcı planı yükseltildi!');
+                } else {
+                    alert('Sipariş iptal edildi.');
+                }
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        // ========== USER CREATION ==========
+
+        function showCreateUserModal() {
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserPassword').value = '';
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserPlan').value = 'FREE';
+            document.getElementById('createUserModal').classList.add('active');
+        }
+
+        async function createUser() {
+            const email = document.getElementById('newUserEmail').value.trim();
+            const password = document.getElementById('newUserPassword').value;
+            const name = document.getElementById('newUserName').value.trim();
+            const plan = document.getElementById('newUserPlan').value;
+
+            if (!email || !password) {
+                alert('E-posta ve şifre gerekli');
+                return;
+            }
+
+            try {
+                await apiRequest('/admin/users', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password, name, plan })
+                });
+                closeModal('createUserModal');
+                loadUsers();
+                alert('Kullanıcı oluşturuldu!');
+            } catch (error) {
+                alert('Hata: ' + (error.error || error.message));
+            }
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

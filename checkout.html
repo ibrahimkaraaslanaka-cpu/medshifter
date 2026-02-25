@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Shifter - Satın Alma</title>
+    <meta name="description" content="Med Shifter planınızı yükseltin ve tüm özelliklere erişin.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        /* Header */
+        .checkout-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .checkout-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: #f1f5f9;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #f1f5f9;
+        }
+
+        /* Main */
+        .checkout-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        /* Plan Summary */
+        .plan-summary {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .plan-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .plan-icon.individual {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.4));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .plan-icon.business {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.4));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .plan-desc {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Features */
+        .features-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0;
+            color: #cbd5e1;
+            font-size: 0.9375rem;
+        }
+
+        .features-list li .check {
+            color: #4ade80;
+            font-weight: 700;
+        }
+
+        /* Period Toggle */
+        .period-toggle-container {
+            margin-bottom: 2rem;
+        }
+
+        .period-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            margin-bottom: 0.75rem;
+        }
+
+        .period-toggle {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .period-btn .save-tag {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .order-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Coupon */
+        .coupon-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .coupon-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .coupon-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .coupon-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .coupon-btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .coupon-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .coupon-result {
+            margin-top: 0.5rem;
+            font-size: 0.813rem;
+            display: none;
+        }
+
+        .coupon-result.success {
+            color: #4ade80;
+            display: block;
+        }
+
+        .coupon-result.error {
+            color: #f87171;
+            display: block;
+        }
+
+        /* Price Breakdown */
+        .price-breakdown {
+            padding: 1.5rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 0.9375rem;
+        }
+
+        .price-row.discount {
+            color: #4ade80;
+        }
+
+        .price-row.total {
+            padding-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .price-original {
+            text-decoration: line-through;
+            color: #64748b;
+            margin-right: 0.5rem;
+        }
+
+        /* CTA */
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .checkout-note {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        /* Payment iFrame Container */
+        .payment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: none;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .payment-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-header p {
+            color: #94a3b8;
+            font-size: 0.9375rem;
+        }
+
+        .payment-order-info {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-order-info .info-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payment-order-info .plan-badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.813rem;
+            font-weight: 600;
+        }
+
+        .payment-order-info .plan-badge.business {
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+        }
+
+        .payment-order-info .order-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .iframe-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .iframe-wrapper iframe {
+            width: 100%;
+            border: none;
+        }
+
+        .payment-back-btn {
+            display: block;
+            text-align: center;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .payment-back-btn:hover {
+            color: #f1f5f9;
+        }
+
+        /* Payment status (post-payment) */
+        .payment-status-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+            display: none;
+        }
+
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 1rem;
+        }
+
+        .status-desc {
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .status-btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .status-btn.success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .status-btn.fail {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .status-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Spinner */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner-text {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        /* Login Required */
+        .login-required {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .login-required .icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-required h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-required p {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        .login-btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                padding: 1.5rem 1rem;
+                gap: 1.5rem;
+            }
+
+            .order-card {
+                position: static;
+            }
+
+            .payment-container {
+                padding: 1rem;
+            }
+
+            .payment-order-info {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="checkout-header">
+        <a href="/" class="checkout-logo">🏥 Med Shifter</a>
+        <a href="/pricing" class="back-link">← Fiyatlandırmaya Dön</a>
+    </header>
+
+    <!-- Login required state -->
+    <div id="loginRequired" class="login-required" style="display: none;">
+        <div class="icon">🔒</div>
+        <h2>Giriş Yapmanız Gerekiyor</h2>
+        <p>Plan satın almak için önce giriş yapın veya hesap oluşturun.</p>
+        <a href="/app" class="login-btn">Giriş Yap / Kayıt Ol</a>
+    </div>
+
+    <!-- Plan Selection & Order Form -->
+    <div class="checkout-container" id="checkoutContent" style="display: none;">
+        <!-- Plan Summary -->
+        <div class="plan-summary">
+            <div class="plan-header">
+                <div class="plan-icon" id="planIcon">
+                    💎
+                </div>
+                <div>
+                    <div class="plan-name" id="planName">Plan</div>
+                    <div class="plan-desc" id="planDesc">Plan açıklaması</div>
+                </div>
+            </div>
+
+            <ul class="features-list" id="featuresList">
+                <!-- Filled by JS -->
+            </ul>
+
+            <div class="period-toggle-container">
+                <div class="period-label">Faturalandırma Dönemi</div>
+                <div class="period-toggle">
+                    <button class="period-btn" data-period="monthly" onclick="setPeriod('monthly')">Aylık</button>
+                    <button class="period-btn active" data-period="yearly" onclick="setPeriod('yearly')">
+                        Yıllık <span class="save-tag">%50 Tasarruf</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Card -->
+        <div class="order-card">
+            <h2 class="order-title">Sipariş Özeti</h2>
+
+            <div class="coupon-section">
+                <div class="coupon-input-group">
+                    <input type="text" class="coupon-input" id="couponInput" placeholder="KUPON KODU">
+                    <button class="coupon-btn" id="couponBtn" onclick="validateCoupon()">Uygula</button>
+                </div>
+                <div class="coupon-result" id="couponResult"></div>
+            </div>
+
+            <div class="price-breakdown" id="priceBreakdown">
+                <!-- Filled by JS -->
+            </div>
+
+            <button class="checkout-btn" id="checkoutBtn" onclick="initPayment()">
+                💳 Ödemeye Geç
+            </button>
+
+            <p class="checkout-note">
+                Güvenli ödeme PayTR altyapısı ile gerçekleştirilir.
+                Kredi kartı bilgileriniz tarafımızca saklanmaz.
+            </p>
+        </div>
+    </div>
+
+    <!-- PayTR Payment iFrame -->
+    <div class="payment-container" id="paymentContainer">
+        <div class="payment-header">
+            <h2>💳 Ödeme</h2>
+            <p>Kredi veya banka kartı bilgilerinizi girerek ödemeyi tamamlayın.</p>
+        </div>
+
+        <div class="payment-order-info" id="paymentOrderInfo">
+            <!-- Filled by JS -->
+        </div>
+
+        <div class="iframe-wrapper" id="iframeWrapper">
+            <div class="spinner-container" id="iframeSpinner">
+                <div class="spinner"></div>
+                <span class="spinner-text">Ödeme formu yükleniyor...</span>
+            </div>
+            <!-- PayTR iframe will be injected here -->
+        </div>
+
+        <a class="payment-back-btn" onclick="cancelPayment()">← Siparişe Dön</a>
+    </div>
+
+    <!-- Payment Status (shown after redirect from PayTR) -->
+    <div class="payment-status-container" id="paymentStatusContainer">
+        <div class="status-icon" id="statusIcon">⏳</div>
+        <h2 class="status-title" id="statusTitle">Ödeme Kontrol Ediliyor...</h2>
+        <p class="status-desc" id="statusDesc">Ödemeniz onaylanıyor, lütfen bekleyin...</p>
+        <div id="statusActions"></div>
+    </div>
+
+    <script src="config.js?v=2.0.2"></script>
+    <!-- PayTR iFrame resizer script -->
+    <script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
+    <script>
+        const API_URL = window.AppConfig?.API_URL || 'http://localhost:3001/api';
+        const SUPABASE_URL = window.AppConfig?.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.AppConfig?.SUPABASE_ANON_KEY;
+
+        let supabase = null;
+        let userSession = null;
+        let selectedPlan = 'INDIVIDUAL';
+        let selectedPeriod = 'yearly';
+        let selectedCurrency = 'TRY';
+        let appliedCoupon = null;
+        let currentOrderId = null;
+        let statusPollInterval = null;
+
+        const PLANS = {
+            INDIVIDUAL: {
+                name: 'Bireysel Plan',
+                desc: 'Bireysel kullanım için ideal',
+                icon: '💎',
+                iconClass: 'individual',
+                features: [
+                    '5 takvim / ay',
+                    '20 personel',
+                    '8 çalışma alanı',
+                    'Sınırsız kaydetme',
+                    'Sınırsız dışa aktarma',
+                    'PDF + Excel dışa aktarma',
+                    'Takvim paylaşımı'
+                ]
+            },
+            BUSINESS: {
+                name: 'Business Plan',
+                desc: 'Büyük ekipler ve hastaneler için',
+                icon: '🏢',
+                iconClass: 'business',
+                features: [
+                    'Sınırsız takvim',
+                    '50 personel',
+                    '20 çalışma alanı',
+                    'Sınırsız kaydetme',
+                    'Sınırsız dışa aktarma',
+                    'Tüm dışa aktarma formatları',
+                    'Takvim paylaşımı',
+                    'Öncelikli destek'
+                ]
+            }
+        };
+
+        const PRICES = {
+            INDIVIDUAL: { monthly: { TRY: 380, USD: 19 }, yearly: { TRY: 190, USD: 5 } },
+            BUSINESS: { monthly: { TRY: 1180, USD: 59 }, yearly: { TRY: 590, USD: 15 } }
+        };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+
+            // Check if returning from PayTR payment
+            const paymentStatus = params.get('status');
+            const orderId = params.get('order');
+
+            if (paymentStatus && orderId) {
+                // Returning from PayTR redirect
+                await initSupabase();
+                if (!userSession) {
+                    document.getElementById('loginRequired').style.display = 'block';
+                    return;
+                }
+                showPaymentStatus(paymentStatus, orderId);
+                return;
+            }
+
+            // Normal checkout flow
+            selectedPlan = params.get('plan') || 'INDIVIDUAL';
+            selectedPeriod = params.get('period') || 'yearly';
+            selectedCurrency = params.get('currency') || 'TRY';
+
+            if (!PLANS[selectedPlan]) selectedPlan = 'INDIVIDUAL';
+
+            await initSupabase();
+
+            if (!userSession) {
+                document.getElementById('loginRequired').style.display = 'block';
+                document.getElementById('checkoutContent').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('checkoutContent').style.display = 'grid';
+            renderPlan();
+            renderPrice();
+        });
+
+        async function initSupabase() {
+            if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const { data: { session } } = await supabase.auth.getSession();
+                userSession = session;
+            }
+        }
+
+        function renderPlan() {
+            const plan = PLANS[selectedPlan];
+
+            document.getElementById('planIcon').innerHTML = plan.icon;
+            document.getElementById('planIcon').className = `plan-icon ${plan.iconClass}`;
+            document.getElementById('planName').textContent = plan.name;
+            document.getElementById('planDesc').textContent = plan.desc;
+
+            const featuresList = document.getElementById('featuresList');
+            featuresList.innerHTML = plan.features.map(f =>
+                `<li><span class="check">✓</span> ${f}</li>`
+            ).join('');
+
+            // Set active period
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.period === selectedPeriod);
+            });
+        }
+
+        function setPeriod(period) {
+            selectedPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.period === period);
+            });
+            renderPrice();
+        }
+
+        function renderPrice() {
+            const monthlyPrice = PRICES[selectedPlan][selectedPeriod][selectedCurrency];
+            let totalAmount;
+            let periodLabel;
+
+            if (selectedPeriod === 'yearly') {
+                totalAmount = monthlyPrice * 12;
+                periodLabel = 'Yıllık';
+            } else {
+                totalAmount = monthlyPrice;
+                periodLabel = 'Aylık';
+            }
+
+            const currSymbol = selectedCurrency === 'TRY' ? '₺' : '$';
+            let discountAmount = 0;
+
+            let html = `
+                <div class="price-row">
+                    <span>${PLANS[selectedPlan].name} (${periodLabel})</span>
+                    <span>${currSymbol}${totalAmount.toLocaleString('tr-TR')}</span>
+                </div>
+            `;
+
+            if (selectedPeriod === 'yearly') {
+                const monthlyFull = PRICES[selectedPlan].monthly[selectedCurrency];
+                const yearlyFull = monthlyFull * 12;
+                const savings = yearlyFull - totalAmount;
+                html += `
+                    <div class="price-row discount">
+                        <span>Yıllık indirim</span>
+                        <span>-${currSymbol}${savings.toLocaleString('tr-TR')}</span>
+                    </div>
+                `;
+            }
+
+            if (appliedCoupon) {
+                discountAmount = totalAmount * (appliedCoupon.discount_percent / 100);
+                html += `
+                    <div class="price-row discount">
+                        <span>Kupon: ${appliedCoupon.code} (%${appliedCoupon.discount_percent})</span>
+                        <span>-${currSymbol}${Math.round(discountAmount).toLocaleString('tr-TR')}</span>
+                    </div>
+                `;
+                totalAmount = totalAmount - discountAmount;
+            }
+
+            html += `
+                <div class="price-row total">
+                    <span>Toplam</span>
+                    <span>${currSymbol}${Math.round(totalAmount).toLocaleString('tr-TR')}</span>
+                </div>
+            `;
+
+            if (selectedPeriod === 'yearly') {
+                const perMonth = Math.round(totalAmount / 12);
+                html += `
+                    <div class="price-row" style="font-size: 0.813rem; color: #64748b;">
+                        <span></span>
+                        <span>Aylık ${currSymbol}${perMonth.toLocaleString('tr-TR')}</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('priceBreakdown').innerHTML = html;
+        }
+
+        // Coupon validation
+        async function validateCoupon() {
+            const code = document.getElementById('couponInput').value.trim();
+            const resultEl = document.getElementById('couponResult');
+
+            if (!code) {
+                resultEl.textContent = 'Kupon kodu girin';
+                resultEl.className = 'coupon-result error';
+                return;
+            }
+
+            document.getElementById('couponBtn').textContent = '...';
+
+            try {
+                const response = await fetch(`${API_URL}/checkout/validate-coupon`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userSession.access_token}`
+                    },
+                    body: JSON.stringify({ code, plan: selectedPlan })
+                });
+
+                const data = await response.json();
+
+                if (data.valid) {
+                    appliedCoupon = data.coupon;
+                    resultEl.textContent = `✓ ${data.coupon.code}: %${data.coupon.discount_percent} indirim uygulandı!`;
+                    resultEl.className = 'coupon-result success';
+                    renderPrice();
+                } else {
+                    appliedCoupon = null;
+                    resultEl.textContent = `✗ ${data.error}`;
+                    resultEl.className = 'coupon-result error';
+                    renderPrice();
+                }
+            } catch (error) {
+                resultEl.textContent = '✗ Bir hata oluştu';
+                resultEl.className = 'coupon-result error';
+            }
+
+            document.getElementById('couponBtn').textContent = 'Uygula';
+        }
+
+        // Initialize PayTR payment
+        async function initPayment() {
+            const btn = document.getElementById('checkoutBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Ödeme hazırlanıyor...';
+
+            try {
+                const response = await fetch(`${API_URL}/checkout/init-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userSession.access_token}`
+                    },
+                    body: JSON.stringify({
+                        plan: selectedPlan,
+                        billing_period: selectedPeriod,
+                        currency: selectedCurrency,
+                        coupon_code: appliedCoupon ? appliedCoupon.code : null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.iframe_token) {
+                    currentOrderId = data.order.id;
+                    showPaymentIframe(data.iframe_token, data.order);
+                } else {
+                    alert('Hata: ' + (data.error || 'Ödeme başlatılamadı'));
+                    btn.disabled = false;
+                    btn.textContent = '💳 Ödemeye Geç';
+                }
+            } catch (error) {
+                alert('Bir hata oluştu: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = '💳 Ödemeye Geç';
+            }
+        }
+
+        // Show PayTR iFrame
+        function showPaymentIframe(iframeToken, order) {
+            // Hide checkout form, show payment container
+            document.getElementById('checkoutContent').style.display = 'none';
+            document.getElementById('paymentContainer').style.display = 'block';
+
+            // Fill order info bar
+            const currSymbol = order.currency === 'TRY' ? '₺' : '$';
+            const planClass = order.plan === 'BUSINESS' ? 'business' : '';
+            const planLabel = order.plan === 'INDIVIDUAL' ? 'Bireysel' : 'Business';
+            const periodLabel = order.billing_period === 'yearly' ? 'Yıllık' : 'Aylık';
+
+            document.getElementById('paymentOrderInfo').innerHTML = `
+                <div class="info-left">
+                    <span class="plan-badge ${planClass}">${planLabel} • ${periodLabel}</span>
+                </div>
+                <div class="order-amount">${currSymbol}${order.amount.toLocaleString('tr-TR')}</div>
+            `;
+
+            // Inject the PayTR iFrame
+            const iframeWrapper = document.getElementById('iframeWrapper');
+            const spinner = document.getElementById('iframeSpinner');
+
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.paytr.com/odeme/guvenli/${iframeToken}`;
+            iframe.id = 'paytriframe';
+            iframe.frameBorder = '0';
+            iframe.scrolling = 'no';
+            iframe.style.width = '100%';
+
+            iframe.onload = () => {
+                spinner.style.display = 'none';
+                // Activate PayTR iFrame resizer
+                if (window.iFrameResize) {
+                    iFrameResize({}, '#paytriframe');
+                }
+            };
+
+            iframeWrapper.appendChild(iframe);
+        }
+
+        // Cancel payment and go back to checkout
+        function cancelPayment() {
+            document.getElementById('paymentContainer').style.display = 'none';
+            document.getElementById('checkoutContent').style.display = 'grid';
+
+            // Remove iframe
+            const iframe = document.getElementById('paytriframe');
+            if (iframe) iframe.remove();
+
+            // Reset spinner
+            document.getElementById('iframeSpinner').style.display = 'flex';
+
+            // Reset button
+            const btn = document.getElementById('checkoutBtn');
+            btn.disabled = false;
+            btn.textContent = '💳 Ödemeye Geç';
+        }
+
+        // Show payment status (when returning from PayTR merchant_ok/fail URLs)
+        function showPaymentStatus(status, orderId) {
+            document.getElementById('paymentStatusContainer').style.display = 'block';
+
+            if (status === 'ok') {
+                // Start polling for actual status
+                currentOrderId = orderId;
+                pollOrderStatus();
+            } else {
+                // Payment failed
+                document.getElementById('statusIcon').textContent = '❌';
+                document.getElementById('statusTitle').textContent = 'Ödeme Başarısız';
+                document.getElementById('statusDesc').textContent =
+                    'Ödemeniz tamamlanamadı. Lütfen tekrar deneyin veya farklı bir kart kullanın.';
+                document.getElementById('statusActions').innerHTML = `
+                    <a href="/checkout?plan=${selectedPlan}&period=${selectedPeriod}&currency=${selectedCurrency}" class="status-btn fail">Tekrar Dene</a>
+                `;
+            }
+        }
+
+        // Poll order status until completed or timeout
+        async function pollOrderStatus() {
+            const orderId = currentOrderId;
+            let attempts = 0;
+            const maxAttempts = 30; // 30 x 2s = 60 seconds max
+
+            const poll = async () => {
+                attempts++;
+
+                try {
+                    const response = await fetch(`${API_URL}/checkout/order-status/${orderId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${userSession.access_token}`
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.order) {
+                        if (data.order.status === 'completed') {
+                            // Payment successful!
+                            document.getElementById('statusIcon').textContent = '🎉';
+                            document.getElementById('statusTitle').textContent = 'Ödeme Başarılı!';
+                            document.getElementById('statusDesc').textContent =
+                                'Ödemeniz başarıyla tamamlandı. Planınız aktif edildi ve tüm özelliklere erişebilirsiniz.';
+                            document.getElementById('statusActions').innerHTML = `
+                                <a href="/app" class="status-btn success">Uygulamaya Git →</a>
+                            `;
+                            return;
+                        } else if (data.order.status === 'failed') {
+                            // Payment failed
+                            document.getElementById('statusIcon').textContent = '❌';
+                            document.getElementById('statusTitle').textContent = 'Ödeme Başarısız';
+                            document.getElementById('statusDesc').textContent =
+                                'Ödemeniz onaylanamadı. Lütfen tekrar deneyin.';
+                            document.getElementById('statusActions').innerHTML = `
+                                <a href="/checkout?plan=${selectedPlan}&period=${selectedPeriod}&currency=${selectedCurrency}" class="status-btn fail">Tekrar Dene</a>
+                            `;
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    // Ignore polling errors
+                }
+
+                if (attempts < maxAttempts) {
+                    setTimeout(poll, 2000);
+                } else {
+                    // Timeout – likely still processing
+                    document.getElementById('statusIcon').textContent = '⏳';
+                    document.getElementById('statusTitle').textContent = 'Ödeme İşleniyor';
+                    document.getElementById('statusDesc').textContent =
+                        'Ödemeniz henüz onaylanmadı. Bu birkaç dakika sürebilir. Lütfen uygulamaya giderek durumu kontrol edin.';
+                    document.getElementById('statusActions').innerHTML = `
+                        <a href="/app" class="status-btn fail">Uygulamaya Git</a>
+                    `;
+                }
+            };
+
+            poll();
+        }
+    </script>
+</body>
+
+</html>

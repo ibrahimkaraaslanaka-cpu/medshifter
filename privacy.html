@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası - Med Shifter</title>
+    <meta name="description" content="Med Shifter gizlilik politikası ve kişisel verilerin korunması hakkında bilgi.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: white;
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 1.5rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 7rem 2rem 4rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, white 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            color: rgba(255, 255, 255, 0.8);
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>Shifter</span></div>
+            </a>
+        </div>
+    </header>
+
+    <main class="main">
+        <a href="/" class="back-link">← Ana Sayfaya Dön</a>
+
+        <h1>Gizlilik Politikası</h1>
+        <p class="subtitle">Son güncelleme: Şubat 2026</p>
+
+        <div class="card">
+            <h2>1. Toplanan Veriler</h2>
+            <p>Med Shifter olarak hizmetlerimizi sunmak için aşağıdaki verileri toplarız:</p>
+            <ul>
+                <li><strong>Hesap Bilgileri:</strong> E-posta adresi, ad-soyad (isteğe bağlı)</li>
+                <li><strong>Kullanım Verileri:</strong> Oluşturulan takvimler, vardiya planları</li>
+                <li><strong>Teknik Veriler:</strong> IP adresi, tarayıcı türü, erişim zamanları</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>2. Verilerin Kullanımı</h2>
+            <p>Topladığımız veriler aşağıdaki amaçlarla kullanılır:</p>
+            <ul>
+                <li>Hizmetlerimizin sunulması ve iyileştirilmesi</li>
+                <li>Hesap güvenliğinin sağlanması</li>
+                <li>Müşteri desteği sağlanması</li>
+                <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>3. Veri Güvenliği</h2>
+            <p>Verilerinizi korumak için endüstri standardı güvenlik önlemleri kullanırız:</p>
+            <ul>
+                <li>SSL/TLS şifreleme ile veri aktarımı</li>
+                <li>Şifreler bcrypt algoritması ile hashlenir</li>
+                <li>Düzenli güvenlik denetimleri</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>4. Üçüncü Taraflarla Paylaşım</h2>
+            <p>Kişisel verilerinizi üçüncü taraflarla paylaşmayız, aşağıdaki durumlar hariç:</p>
+            <ul>
+                <li>Yasal zorunluluk durumlarında</li>
+                <li>Sizin açık izniniz olduğunda</li>
+                <li>Hizmet sağlayıcılarımızla (hosting, ödeme işlemleri)</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>5. Çerezler (Cookies)</h2>
+            <p>Sitemizde oturum yönetimi ve kullanıcı deneyimini iyileştirmek için çerezler kullanılmaktadır. Çerezleri
+                tarayıcı ayarlarınızdan devre dışı bırakabilirsiniz.</p>
+        </div>
+
+        <div class="card">
+            <h2>6. KVKK Kapsamında Haklarınız</h2>
+            <p>6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında aşağıdaki haklara sahipsiniz:</p>
+            <ul>
+                <li>Verilerinizin işlenip işlenmediğini öğrenme</li>
+                <li>Verilerinize erişim talep etme</li>
+                <li>Verilerinizin düzeltilmesini veya silinmesini isteme</li>
+                <li>İşlemenin kısıtlanmasını talep etme</li>
+            </ul>
+            <p>Bu haklarınızı kullanmak için <strong>info@medshifter.com</strong> adresine e-posta gönderebilirsiniz.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>7. İletişim</h2>
+            <p>Gizlilik politikamız hakkında sorularınız için:</p>
+            <p><strong>E-posta:</strong> info@medshifter.com</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Med Shifter. Tüm hakları saklıdır.</p>
+    </footer>
+</body>
+
+</html>
