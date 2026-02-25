@@ -2955,6 +2955,101 @@ function renderDetailedStats() {
     `;
 
     splitRow.insertAdjacentHTML('beforeend', areaHtml);
+
+    // === NEW: Daily Assignment Heatmap (Person × Day) ===
+    const dailyStatsContainer = document.getElementById('dailyStatsGrid');
+    if (!dailyStatsContainer) {
+        // Create the container if it doesn't exist
+        const section = document.getElementById('detailedStatsSection');
+        if (section) {
+            const existingDaily = section.querySelector('#dailyStatsGrid');
+            if (!existingDaily) {
+                const div = document.createElement('div');
+                div.id = 'dailyStatsGrid';
+                div.className = 'detailed-stats-grid';
+                div.style.marginTop = '1.5rem';
+                section.appendChild(div);
+            }
+        }
+    }
+
+    const dailyGrid = document.getElementById('dailyStatsGrid');
+    if (!dailyGrid) return;
+
+    // Calculate person × day data
+    const personDayStats = {};
+    state.people.forEach(person => {
+        personDayStats[person] = {};
+        state.schedule.forEach((day, idx) => {
+            personDayStats[person][idx] = 0;
+        });
+    });
+
+    state.schedule.forEach((day, idx) => {
+        state.workAreas.forEach(area => {
+            const person = day[`workArea${area.id}`];
+            if (person && personDayStats[person]) {
+                personDayStats[person][idx]++;
+            }
+        });
+    });
+
+    // Build the heatmap table
+    let dailyHtml = `
+        <div class="detailed-stats-card">
+            <h4>📅 Günlük Görev Dağılımı</h4>
+            <div class="daily-heatmap-scroll">
+                <table class="person-area-stats daily-heatmap">
+                    <thead>
+                        <tr>
+                            <th class="sticky-col">Kişi</th>
+                            ${state.schedule.map((day, idx) => {
+        const d = day.date instanceof Date ? day.date : new Date(day.date);
+        const dayNum = d.getDate();
+        const dayName = day.dayName ? day.dayName.substring(0, 3) : '';
+        return `<th class="day-header"><span class="day-num">${dayNum}</span><span class="day-name">${dayName}</span></th>`;
+    }).join('')}
+                            <th>Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+
+    // Sort people by total assignments (descending)
+    const sortedByTotal = [...state.people].sort((a, b) => {
+        const totalA = Object.values(personDayStats[a]).reduce((s, v) => s + v, 0);
+        const totalB = Object.values(personDayStats[b]).reduce((s, v) => s + v, 0);
+        return totalB - totalA;
+    });
+
+    sortedByTotal.forEach(person => {
+        const stats = personDayStats[person];
+        const total = Object.values(stats).reduce((s, v) => s + v, 0);
+
+        dailyHtml += `
+            <tr>
+                <td class="sticky-col person-name-cell">${person}</td>
+                ${state.schedule.map((_, idx) => {
+            const count = stats[idx];
+            let cellClass = 'heatmap-cell';
+            if (count === 0) cellClass += ' heatmap-empty';
+            else if (count === 1) cellClass += ' heatmap-1';
+            else cellClass += ' heatmap-multi';
+            return `<td class="${cellClass}">${count > 0 ? count : ''}</td>`;
+        }).join('')}
+                <td class="stat-cell-highlight">${total}</td>
+            </tr>
+        `;
+    });
+
+    dailyHtml += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    dailyGrid.innerHTML = dailyHtml;
 }
 
 // ============================================
