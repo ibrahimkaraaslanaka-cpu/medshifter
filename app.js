@@ -2976,66 +2976,61 @@ function renderDetailedStats() {
     const dailyGrid = document.getElementById('dailyStatsGrid');
     if (!dailyGrid) return;
 
-    // Calculate person × day data
-    const personDayStats = {};
+    // Calculate person × weekday data
+    const weekdayNames = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+    const weekdayShort = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+
+    const personWeekdayStats = {};
     state.people.forEach(person => {
-        personDayStats[person] = {};
-        state.schedule.forEach((day, idx) => {
-            personDayStats[person][idx] = 0;
-        });
+        personWeekdayStats[person] = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun
     });
 
-    state.schedule.forEach((day, idx) => {
+    state.schedule.forEach(day => {
+        const d = day.date instanceof Date ? day.date : new Date(day.date);
+        // JS getDay(): 0=Sun, 1=Mon ... 6=Sat → convert to 0=Mon ... 6=Sun
+        const jsDay = d.getDay();
+        const weekdayIdx = jsDay === 0 ? 6 : jsDay - 1;
+
         state.workAreas.forEach(area => {
             const person = day[`workArea${area.id}`];
-            if (person && personDayStats[person]) {
-                personDayStats[person][idx]++;
+            if (person && personWeekdayStats[person]) {
+                personWeekdayStats[person][weekdayIdx]++;
             }
         });
     });
 
-    // Build the heatmap table
+    // Build the weekday stats table
     let dailyHtml = `
         <div class="detailed-stats-card">
-            <h4>📅 Günlük Görev Dağılımı</h4>
-            <div class="daily-heatmap-scroll">
-                <table class="person-area-stats daily-heatmap">
-                    <thead>
-                        <tr>
-                            <th class="sticky-col">Kişi</th>
-                            ${state.schedule.map((day, idx) => {
-        const d = day.date instanceof Date ? day.date : new Date(day.date);
-        const dayNum = d.getDate();
-        const dayName = day.dayName ? day.dayName.substring(0, 3) : '';
-        return `<th class="day-header"><span class="day-num">${dayNum}</span><span class="day-name">${dayName}</span></th>`;
-    }).join('')}
-                            <th>Toplam</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <h4>📅 Gün Bazında Görev Dağılımı</h4>
+            <table class="person-area-stats">
+                <thead>
+                    <tr>
+                        <th>Kişi</th>
+                        ${weekdayNames.map((name, i) => `<th>${weekdayShort[i]}</th>`).join('')}
+                        <th>Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
     // Sort people by total assignments (descending)
     const sortedByTotal = [...state.people].sort((a, b) => {
-        const totalA = Object.values(personDayStats[a]).reduce((s, v) => s + v, 0);
-        const totalB = Object.values(personDayStats[b]).reduce((s, v) => s + v, 0);
+        const totalA = personWeekdayStats[a].reduce((s, v) => s + v, 0);
+        const totalB = personWeekdayStats[b].reduce((s, v) => s + v, 0);
         return totalB - totalA;
     });
 
     sortedByTotal.forEach(person => {
-        const stats = personDayStats[person];
-        const total = Object.values(stats).reduce((s, v) => s + v, 0);
+        const stats = personWeekdayStats[person];
+        const total = stats.reduce((s, v) => s + v, 0);
 
         dailyHtml += `
             <tr>
-                <td class="sticky-col person-name-cell">${person}</td>
-                ${state.schedule.map((_, idx) => {
-            const count = stats[idx];
-            let cellClass = 'heatmap-cell';
-            if (count === 0) cellClass += ' heatmap-empty';
-            else if (count === 1) cellClass += ' heatmap-1';
-            else cellClass += ' heatmap-multi';
-            return `<td class="${cellClass}">${count > 0 ? count : ''}</td>`;
+                <td>${person}</td>
+                ${stats.map(count => {
+            let cellClass = count > 0 ? 'stat-cell-highlight' : '';
+            return `<td class="${cellClass}">${count}</td>`;
         }).join('')}
                 <td class="stat-cell-highlight">${total}</td>
             </tr>
@@ -3043,9 +3038,8 @@ function renderDetailedStats() {
     });
 
     dailyHtml += `
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
     `;
 
