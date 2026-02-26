@@ -3231,19 +3231,37 @@ async function shareCurrentVersion() {
         Toast.info('Takvim kaydediliyor...');
 
         // Save current schedule to backend (skipCounter: share-triggered saves don't count)
-        await ApiClient.request(`/calendars/${calId}?skipCounter=true`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                title: state.scheduleTitle,
-                month: state.selectedMonth,
-                year: state.selectedYear,
-                people: state.people,
-                workAreas: state.workAreas,
-                schedule: state.schedule,
-                conditions: state.conditions,
-                shiftDelays: state.shiftDelays
-            })
-        });
+        try {
+            await ApiClient.request(`/calendars/${calId}?skipCounter=true`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    title: state.scheduleTitle,
+                    month: state.selectedMonth,
+                    year: state.selectedYear,
+                    people: state.people,
+                    workAreas: state.workAreas,
+                    schedule: state.schedule,
+                    conditions: state.conditions,
+                    shiftDelays: state.shiftDelays
+                })
+            });
+        } catch (putError) {
+            // If calendar not found (404), clear stale ID and re-create
+            if (putError.message && putError.message.includes('bulunamadı')) {
+                console.warn('[Share] Calendar not found, re-creating...');
+                state.backendCalendarId = null;
+                state.calendarId = null;
+                Toast.info('Takvim yeniden oluşturuluyor...');
+                const saved = await saveToCloud();
+                if (!saved) {
+                    Toast.error('Takvim kaydedilemedi, paylaşım yapılamıyor.');
+                    return;
+                }
+                calId = state.backendCalendarId || state.calendarId;
+            } else {
+                throw putError;
+            }
+        }
 
         Toast.info('Paylaşım linki oluşturuluyor...');
         const result = await ApiClient.request(`/calendars/${calId}/share`, {
