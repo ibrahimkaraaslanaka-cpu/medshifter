@@ -972,11 +972,20 @@ async function init() {
                 } else if (event === 'SIGNED_OUT') {
                     AuthState.clear();
                     updateUserUI();
+                    // Redirect to login when signed out
+                    window.location.href = 'login.html';
                 }
             });
         } catch (e) {
             console.error('Supabase session init error:', e);
         }
+    }
+
+    // === LOGIN GATE: Redirect to login if not authenticated ===
+    if (!AuthState.isLoggedIn()) {
+        console.log('[Auth] Not logged in — redirecting to login page');
+        window.location.href = 'login.html?redirect=app.html&message=auth_required';
+        return; // Stop initialization
     }
 
     updateUserUI();

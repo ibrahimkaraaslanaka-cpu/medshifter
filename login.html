@@ -906,7 +906,9 @@
                 showSuccess('Giriş başarılı! Yönlendiriliyorsunuz...');
 
                 setTimeout(() => {
-                    window.location.href = '/app';
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirect = urlParams.get('redirect');
+                    window.location.href = redirect ? `/${redirect}` : '/app.html';
                 }, 1000);
 
             } catch (error) {
@@ -952,7 +954,9 @@
                 } else {
                     showSuccess('Kayıt başarılı! Yönlendiriliyorsunuz...');
                     setTimeout(() => {
-                        window.location.href = '/app';
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirect = urlParams.get('redirect');
+                        window.location.href = redirect ? `/${redirect}` : '/app.html';
                     }, 1000);
                 }
 
@@ -971,7 +975,7 @@
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/app'
+                        redirectTo: window.location.origin + '/app.html'
                     }
                 });
 
@@ -998,7 +1002,7 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 const redirect = urlParams.get('redirect');
-                window.location.href = redirect ? `/${redirect}` : '/app';
+                window.location.href = redirect ? `/${redirect}` : '/app.html';
             }
         });
     </script>
