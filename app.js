@@ -999,7 +999,36 @@ async function init() {
             updateWorkAreaListStep2();
             updatePreviewTable();
         });
+    } else if (state.currentStep > 1) {
+        // Restore last active step (e.g. after accidental back navigation)
+        goToStep(state.currentStep);
+        if (state.currentStep === 5 && state.schedule.length > 0) {
+            renderTableHeader();
+            renderScheduleTable();
+            renderWorkAreas();
+            renderInlineWorkAreas();
+            updateStats();
+            renderDetailedStats();
+            renderActiveConstraints();
+            renderVersionTabs();
+            updatePageTitleDisplay();
+        }
     }
+
+    // === Navigation Protection ===
+    // Block accidental browser-back from trackpad swipe / keyboard shortcut
+    history.pushState(null, '', location.href);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, '', location.href);
+    });
+
+    // Warn before leaving page if there are unsaved cloud changes
+    window.addEventListener('beforeunload', function (e) {
+        if (state.hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
 }
 
 function populateDateSelectors() {
@@ -4159,6 +4188,11 @@ function loadFromLocalStorage() {
         state.showNobetErtesi = data.showNobetErtesi !== undefined ? data.showNobetErtesi : true;
         state.aiConditions = data.aiConditions || '';
         state.shiftDelays = data.shiftDelays || {};
+
+        // Restore current step position so user returns to where they left off
+        if (data.currentStep) {
+            state.currentStep = data.currentStep;
+        }
 
         if (data.workAreas && data.workAreas.length > 0) {
             state.workAreas = data.workAreas;
