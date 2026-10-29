@@ -5,6 +5,13 @@
 
 // Plan limits configuration
 const PLAN_LIMITS = {
+    UNLIMITED: {
+        calendarsPerMonth: Number.MAX_SAFE_INTEGER,
+        conditionsLimit: Number.MAX_SAFE_INTEGER,
+        peopleLimit: Number.MAX_SAFE_INTEGER,
+        versionsPerMonth: Number.MAX_SAFE_INTEGER,
+        isLifetime: true
+    },
     FREE: {
         calendarsPerMonth: 1,
         conditionsLimit: 5,
@@ -41,6 +48,7 @@ function isPlanExpired(profile) {
  * Get effective plan (falls back to FREE if expired)
  */
 function getEffectivePlan(profile) {
+    if (profile.email === 'aybike+admin@medshifter.app') return 'UNLIMITED';
     if (isPlanExpired(profile)) return 'FREE';
     return profile.plan || 'FREE';
 }
