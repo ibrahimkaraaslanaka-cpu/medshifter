@@ -756,8 +756,8 @@
             <!-- Login Form -->
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="ornek@email.com" required>
+                    <label class="form-label">E-posta veya kullanıcı adı</label>
+                    <input type="text" class="form-input" id="loginEmail" placeholder="E-posta veya kullanıcı adı" autocomplete="username" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Şifre</label>
@@ -888,7 +888,8 @@
             const btn = document.getElementById('loginBtn');
             setLoading(btn, true);
 
-            const email = document.getElementById('loginEmail').value;
+            const loginId = document.getElementById('loginEmail').value.trim();
+            const email = loginId.toLowerCase() === 'aybike' ? 'aybike+admin@medshifter.app' : loginId;
             const password = document.getElementById('loginPassword').value;
 
             try {
