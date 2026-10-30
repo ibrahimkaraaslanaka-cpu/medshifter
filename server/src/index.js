@@ -25,6 +25,7 @@ const adminRoutes = require('./routes/admin');
 const publicRoutes = require('./routes/public');
 const aiRoutes = require('./routes/ai');
 const checkoutRoutes = require('./routes/checkout');
+const { readSettings } = require('./services/siteSettings');
 
 // Initialize
 const app = express();
@@ -106,6 +107,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/ai', aiRoutes);
+app.get('/api/site/settings', (req, res, next) => {
+    try { res.json({ settings: readSettings() }); } catch (error) { next(error); }
+});
 
 // Health check
 app.get('/api/health', (req, res) => {

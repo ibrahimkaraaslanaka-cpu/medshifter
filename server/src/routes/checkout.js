@@ -8,6 +8,7 @@ const express = require('express');
 const crypto = require('crypto');
 const { authMiddleware } = require('../middleware/auth');
 const { logger } = require('../services/logger');
+const { readSettings } = require('../services/siteSettings');
 
 const router = express.Router();
 
@@ -16,18 +17,6 @@ const PAYTR_MERCHANT_ID = process.env.PAYTR_MERCHANT_ID || '';
 const PAYTR_MERCHANT_KEY = process.env.PAYTR_MERCHANT_KEY || '';
 const PAYTR_MERCHANT_SALT = process.env.PAYTR_MERCHANT_SALT || '';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://medshifter.app';
-
-// Price configuration
-const PRICES = {
-    INDIVIDUAL: {
-        monthly: { TRY: 380, USD: 19 },
-        yearly: { TRY: 190, USD: 5 }  // per month, billed annually
-    },
-    BUSINESS: {
-        monthly: { TRY: 1180, USD: 59 },
-        yearly: { TRY: 590, USD: 15 }  // per month, billed annually
-    }
-};
 
 /**
  * POST /api/checkout/validate-coupon
@@ -157,7 +146,7 @@ router.post('/init-payment', authMiddleware, async (req, res, next) => {
         }
 
         // Calculate price
-        let monthlyPrice = PRICES[plan][billing_period][curr];
+        let monthlyPrice = readSettings().prices[plan][billing_period][curr];
         let totalAmount;
         if (billing_period === 'yearly') {
             totalAmount = monthlyPrice * 12;
@@ -485,7 +474,7 @@ router.get('/order-status/:orderId', authMiddleware, async (req, res, next) => {
  * Get current prices (no auth needed)
  */
 router.get('/prices', (req, res) => {
-    res.json({ prices: PRICES });
+    res.json({ prices: readSettings().prices });
 });
 
 module.exports = router;

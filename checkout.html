@@ -715,10 +715,7 @@
             }
         };
 
-        const PRICES = {
-            INDIVIDUAL: { monthly: { TRY: 380, USD: 19 }, yearly: { TRY: 190, USD: 5 } },
-            BUSINESS: { monthly: { TRY: 1180, USD: 59 }, yearly: { TRY: 590, USD: 15 } }
-        };
+        let PRICES;
 
         // Init
         document.addEventListener('DOMContentLoaded', async () => {
@@ -745,6 +742,17 @@
             selectedCurrency = params.get('currency') || 'TRY';
 
             if (!PLANS[selectedPlan]) selectedPlan = 'INDIVIDUAL';
+
+            try {
+                const priceResponse = await fetch(`${API_URL}/checkout/prices`, { cache: 'no-store' });
+                if (!priceResponse.ok) throw new Error('Fiyatlar yüklenemedi');
+                PRICES = (await priceResponse.json()).prices;
+                if (!PRICES?.[selectedPlan]?.[selectedPeriod]?.[selectedCurrency]) throw new Error('Fiyat bilgisi geçersiz');
+            } catch (error) {
+                document.getElementById('checkoutContent').style.display = 'none';
+                alert('Güncel fiyatlar alınamadı. Lütfen biraz sonra tekrar deneyin.');
+                return;
+            }
 
             await initSupabase();
 

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yönetim paneli · MedShifter</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">✚</span><span><strong>MedShifter</strong><small>Yönetim merkezi</small></span></div>
+      <nav id="navigation" aria-label="Yönetim menüsü">
+        <button data-view="overview" class="active">▦ <span>Genel bakış</span></button>
+        <button data-view="users">♙ <span>Hesaplar</span></button>
+        <button data-view="calendars">▦ <span>Takvimler</span></button>
+        <button data-view="orders">▤ <span>Siparişler</span></button>
+        <button data-view="coupons">✳ <span>Kuponlar</span></button>
+        <button data-view="settings">⚙ <span>Site ayarları</span></button>
+        <button data-view="admins" data-superadmin hidden>♜ <span>Yöneticiler</span></button>
+      </nav>
+      <div class="sidebar-bottom"><span id="admin-identity">Yönetici</span><button id="logout" class="text-button">Çıkış yap ↗</button></div>
+    </aside>
+    <main class="workspace">
+      <header class="topbar"><div><p class="eyebrow">MEDSHIFTER / YÖNETİM</p><h1 id="view-title">Genel bakış</h1></div><div class="topbar-actions"><a href="https://medshifter.app" target="_blank" rel="noopener">Siteyi aç ↗</a><span id="connection" class="connection">Bağlanıyor</span></div></header>
+      <div id="notice" role="status" hidden></div>
+      <section id="view" aria-live="polite"><p class="muted">Yükleniyor…</p></section>
+    </main>
+  </div>
+  <dialog id="detail-dialog"><div class="dialog-head"><h2 id="dialog-title">Ayrıntı</h2><button id="dialog-close" aria-label="Kapat">×</button></div><div id="dialog-body"></div></dialog>
+  <script src="./admin.js" defer></script>
+</body>
+</html>

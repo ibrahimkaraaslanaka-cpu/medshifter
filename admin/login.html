@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yönetici girişi · MedShifter</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="brand-mark">✚</div>
+    <p class="eyebrow">MEDSHIFTER YÖNETİMİ</p>
+    <h1>Hoş geldiniz</h1>
+    <p class="muted">Hesapları, nöbet takvimlerini ve site ayarlarını tek yerden yönetin.</p>
+    <form id="login-form" class="stack">
+      <label>Kullanıcı adı<input name="username" autocomplete="username" required autofocus></label>
+      <label>Şifre<input name="password" type="password" autocomplete="current-password" required></label>
+      <p id="login-error" class="error" role="alert" hidden></p>
+      <button class="button primary" type="submit">Giriş yap</button>
+    </form>
+    <a class="back-link" href="https://medshifter.app">← MedShifter’a dön</a>
+  </main>
+  <script src="./login.js" defer></script>
+</body>
+</html>

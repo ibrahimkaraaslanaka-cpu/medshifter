@@ -5,16 +5,26 @@
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const { adminAuthMiddleware, superAdminOnly, generateAdminToken } = require('../middleware/adminAuth');
 const { logger } = require('../services/logger');
+const { readSettings, saveSettings } = require('../services/siteSettings');
 
 const router = express.Router();
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 8,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    message: { error: 'Çok fazla giriş denemesi. 15 dakika sonra tekrar deneyin.' }
+});
 
 /**
  * POST /api/admin/login
  * Admin login
  */
-router.post('/login', async (req, res, next) => {
+router.post('/login', loginLimiter, async (req, res, next) => {
     try {
         const { username, password } = req.body;
 
@@ -77,6 +87,20 @@ router.post('/login', async (req, res, next) => {
         });
     } catch (error) {
         next(error);
+    }
+});
+
+router.get('/site-settings', adminAuthMiddleware, (req, res, next) => {
+    try { res.json({ settings: readSettings() }); } catch (error) { next(error); }
+});
+
+router.put('/site-settings', adminAuthMiddleware, superAdminOnly, (req, res) => {
+    try {
+        const settings = saveSettings(req.body);
+        logger.info('Site settings updated', { adminId: req.adminId });
+        res.json({ settings });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 });
 
@@ -682,7 +706,7 @@ router.get('/orders', adminAuthMiddleware, async (req, res, next) => {
 router.put('/orders/:id/status', adminAuthMiddleware, async (req, res, next) => {
     try {
         const { status } = req.body;
-        const validStatuses = ['pending', 'completed', 'failed', 'cancelled'];
+        const validStatuses = ['awaiting_payment', 'pending', 'completed', 'failed', 'cancelled'];
 
         if (!validStatuses.includes(status)) {
             return res.status(400).json({
@@ -691,6 +715,11 @@ router.put('/orders/:id/status', adminAuthMiddleware, async (req, res, next) => 
                 type: 'VALIDATION_ERROR'
             });
         }
+
+        const { data: previousOrder, error: lookupError } = await req.supabaseAdmin
+            .from('orders').select('status').eq('id', req.params.id).single();
+        if (lookupError || !previousOrder) return res.status(404).json({ error: 'Sipariş bulunamadı' });
+        const previousStatus = previousOrder.status;
 
         const { data: order, error } = await req.supabaseAdmin
             .from('orders')
@@ -702,7 +731,7 @@ router.put('/orders/:id/status', adminAuthMiddleware, async (req, res, next) => 
         if (error) throw error;
 
         // If order completed, upgrade user plan
-        if (status === 'completed' && order) {
+        if (status === 'completed' && order && previousStatus !== 'completed') {
             const expiresAt = new Date();
             if (order.billing_period === 'yearly') {
                 expiresAt.setFullYear(expiresAt.getFullYear() + 1);
@@ -765,6 +794,85 @@ router.get('/calendars/:id', adminAuthMiddleware, async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+});
+
+router.patch('/calendars/:id', adminAuthMiddleware, async (req, res, next) => {
+    try {
+        const title = req.body?.title;
+        if (typeof title !== 'string' || !title.trim() || title.length > 160) {
+            return res.status(400).json({ error: 'Takvim başlığı 1-160 karakter olmalı' });
+        }
+        const { data: calendar, error } = await req.supabaseAdmin.from('calendars')
+            .update({ title: title.trim(), updated_at: new Date().toISOString() })
+            .eq('id', req.params.id).select('id, title, updated_at').single();
+        if (error || !calendar) return res.status(404).json({ error: 'Takvim bulunamadı' });
+        logger.info('Calendar renamed by admin', { adminId: req.adminId, calendarId: calendar.id });
+        res.json({ calendar });
+    } catch (error) { next(error); }
+});
+
+router.patch('/calendars/:id/assignments', adminAuthMiddleware, async (req, res, next) => {
+    try {
+        const assignments = req.body?.assignments;
+        if (!Array.isArray(assignments) || assignments.length > 10000) {
+            return res.status(400).json({ error: 'Nöbet atamaları geçersiz' });
+        }
+        const { data: calendar, error } = await req.supabaseAdmin.from('calendars')
+            .select('id, people, work_areas, schedule').eq('id', req.params.id).single();
+        if (error || !calendar) return res.status(404).json({ error: 'Takvim bulunamadı' });
+        const people = new Set(Array.isArray(calendar.people) ? calendar.people : []);
+        const areas = new Set((Array.isArray(calendar.work_areas) ? calendar.work_areas : []).map(area => String(area.id)));
+        const schedule = Array.isArray(calendar.schedule) ? structuredClone(calendar.schedule) : [];
+        if (schedule.some(day => !day || typeof day !== 'object' || Array.isArray(day))) {
+            return res.status(400).json({ error: 'Takvim verisi geçersiz' });
+        }
+        const seen = new Set();
+        for (const item of assignments) {
+            const dayIndex = item?.dayIndex;
+            const areaId = String(item?.areaId);
+            const person = item?.person;
+            const key = `${dayIndex}:${areaId}`;
+            if (!Number.isInteger(dayIndex) || dayIndex < 0 || dayIndex >= schedule.length || !areas.has(areaId) ||
+                typeof person !== 'string' || (person && !people.has(person)) || seen.has(key)) {
+                return res.status(400).json({ error: 'Geçersiz gün, alan veya personel ataması' });
+            }
+            seen.add(key);
+            schedule[dayIndex][`workArea${areaId}`] = person;
+        }
+        for (const day of schedule) {
+            const names = [...areas].map(id => day[`workArea${id}`]).filter(Boolean);
+            if (names.length !== new Set(names).size) {
+                return res.status(400).json({ error: 'Bir personel aynı gün birden fazla alana atanamaz' });
+            }
+        }
+        const { data: updated, error: updateError } = await req.supabaseAdmin.from('calendars')
+            .update({ schedule, updated_at: new Date().toISOString() })
+            .eq('id', calendar.id).select('id, updated_at').single();
+        if (updateError || !updated) throw updateError || new Error('Nöbet atamaları kaydedilemedi');
+        logger.info('Calendar assignments edited by admin', { adminId: req.adminId, calendarId: calendar.id, changed: assignments.length });
+        res.json({ calendar: updated });
+    } catch (error) { next(error); }
+});
+
+router.delete('/calendars/:id', adminAuthMiddleware, superAdminOnly, async (req, res, next) => {
+    try {
+        const { data: calendar, error } = await req.supabaseAdmin.from('calendars')
+            .delete().eq('id', req.params.id).select('id, user_id').single();
+        if (error || !calendar) return res.status(404).json({ error: 'Takvim bulunamadı' });
+        logger.warn('Calendar deleted by superadmin', { adminId: req.adminId, calendarId: calendar.id, userId: calendar.user_id });
+        res.json({ message: 'Takvim silindi' });
+    } catch (error) { next(error); }
+});
+
+router.post('/users/:id/reset-usage', adminAuthMiddleware, superAdminOnly, async (req, res, next) => {
+    try {
+        const { data: user, error } = await req.supabaseAdmin.from('profiles')
+            .update({ calendars_used_this_month: 0, saves_used_this_month: 0, exports_used_this_month: 0, usage_reset_at: new Date().toISOString() })
+            .eq('id', req.params.id).select('id, calendars_used_this_month, saves_used_this_month, exports_used_this_month').single();
+        if (error || !user) return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+        logger.info('Usage reset by superadmin', { adminId: req.adminId, userId: user.id });
+        res.json({ user });
+    } catch (error) { next(error); }
 });
 
 // ========== USER CREATION ==========
