@@ -895,7 +895,7 @@
                         </li>
                     </ul>
                     <a href="/checkout?plan=INDIVIDUAL&period=yearly" class="btn btn-primary checkout-link"
-                        data-plan="INDIVIDUAL">Planı Seç</a>
+                        data-plan="INDIVIDUAL" aria-disabled="true" title="Güncel fiyatlar yükleniyor">Planı Seç</a>
                 </div>
 
                 <!-- Business Plan -->
@@ -933,7 +933,7 @@
                         </li>
                     </ul>
                     <a href="/checkout?plan=BUSINESS&period=yearly" class="btn btn-primary checkout-link"
-                        data-plan="BUSINESS">Planı Seç</a>
+                        data-plan="BUSINESS" aria-disabled="true" title="Güncel fiyatlar yükleniyor">Planı Seç</a>
                 </div>
             </div>
 
@@ -1089,6 +1089,10 @@
                         .forEach((value, position) => { features[position].textContent = value; });
                 }
                 updatePrices();
+                document.querySelectorAll('.checkout-link').forEach(link => {
+                    link.removeAttribute('aria-disabled');
+                    link.removeAttribute('title');
+                });
             } catch (error) {
                 document.querySelectorAll('.checkout-link').forEach(link => {
                     link.setAttribute('aria-disabled', 'true');
@@ -1135,7 +1139,6 @@
             document.getElementById('yearlyLabel').classList.toggle('active', isYearly);
 
             updatePrices();
-            loadLivePricing();
         }
 
         function setCurrency(curr) {
@@ -1157,6 +1160,7 @@
             document.getElementById('yearlyLabel').classList.add('active');
             // Update all prices
             updatePrices();
+            loadLivePricing();
 
             // Auth check for app links - redirect guests to login (Supabase session based)
             document.querySelectorAll('.app-link').forEach(link => {
