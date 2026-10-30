@@ -2457,7 +2457,7 @@ async function startAssignment() {
 
             // === WEEKLY PRIORITY: Hard constraint — directly assign if person is available ===
             const weeklyPerson = parsedConstraints.weeklyPriority?.[currentWeekIdx]?.[area.id];
-            if (weeklyPerson && !usedToday.has(weeklyPerson)) {
+            if (weeklyPerson && state.people.includes(weeklyPerson) && !usedToday.has(weeklyPerson)) {
                 // Check if the weekly priority person passes ALL hard constraints
                 const isNobetErtesi = nobetErtesiPeople.includes(weeklyPerson.toLowerCase());
                 const isDayOff = isOnDayOff(weeklyPerson, day);
