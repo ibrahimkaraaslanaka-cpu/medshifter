@@ -819,7 +819,7 @@
                 <span id="monthlyLabel" class="active">Aylık</span>
                 <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"></div>
                 <span id="yearlyLabel">Yıllık</span>
-                <span class="save-badge">%50 Tasarruf</span>
+                <span class="save-badge">Yıllık plan</span>
             </div>
 
             <!-- Pricing Cards -->
@@ -977,25 +977,25 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr data-limit-field="calendarsPerMonth">
                                 <td>Takvim Oluşturma</td>
                                 <td>1 (ömür boyu)</td>
                                 <td>5 / ay</td>
                                 <td>25 / ay</td>
                             </tr>
-                            <tr>
+                            <tr data-limit-field="conditionsLimit">
                                 <td>Koşul Sayısı</td>
                                 <td>5</td>
                                 <td>10</td>
                                 <td>50</td>
                             </tr>
-                            <tr>
+                            <tr data-limit-field="peopleLimit">
                                 <td>Personel Limiti</td>
                                 <td>5</td>
                                 <td>15</td>
                                 <td>50</td>
                             </tr>
-                            <tr>
+                            <tr data-limit-field="versionsPerMonth">
                                 <td>Versiyon Hakkı</td>
                                 <td>3</td>
                                 <td>15 / ay</td>
@@ -1088,6 +1088,16 @@
                     [limits.calendarsPerMonth, limits.conditionsLimit, limits.peopleLimit, limits.versionsPerMonth]
                         .forEach((value, position) => { features[position].textContent = value; });
                 }
+                document.querySelectorAll('.comparison-table tr[data-limit-field]').forEach(row => {
+                    const field = row.dataset.limitField;
+                    ['FREE', 'INDIVIDUAL', 'BUSINESS'].forEach((plan, index) => {
+                        const suffix = plan === 'FREE' && field === 'calendarsPerMonth'
+                            ? ' (ömür boyu)'
+                            : plan !== 'FREE' && ['calendarsPerMonth', 'versionsPerMonth'].includes(field)
+                                ? ' / ay' : '';
+                        row.children[index + 1].textContent = `${settings.limits[plan][field]}${suffix}`;
+                    });
+                });
                 updatePrices();
                 document.querySelectorAll('.checkout-link').forEach(link => {
                     link.removeAttribute('aria-disabled');
