@@ -93,9 +93,6 @@ const AuthState = {
         this.token = null;
         this.user = null;
         this.usage = null;
-        if (supabaseClient) {
-            supabaseClient.auth.signOut();
-        }
     },
 
     updateUsage(usage) {
@@ -147,7 +144,8 @@ const ApiClient = {
             if (!response.ok) {
                 if (response.status === 401) {
                     AuthState.clear();
-                    window.location.href = '/login?message=auth_required';
+                    if (supabaseClient) await supabaseClient.auth.signOut();
+                    window.location.href = '/login.html?message=auth_required';
                 }
                 throw new Error(data.error || 'İstek başarısız');
             }
@@ -182,9 +180,8 @@ const ApiClient = {
         });
     },
 
-    async updateCalendar(id, data, { skipCounter = false } = {}) {
-        const qs = skipCounter ? '?skipCounter=true' : '';
-        return this.request(`/calendars/${id}${qs}`, {
+    async updateCalendar(id, data) {
+        return this.request(`/calendars/${id}`, {
             method: 'PUT',
             body: JSON.stringify(data)
         });
@@ -2398,6 +2395,8 @@ async function startAssignment() {
 
     // === STEP 2: Process each day ===
     state.schedule.forEach((day) => {
+        // A rerun must not keep assignments that violate the new constraints.
+        state.workAreas.forEach(area => { day[`workArea${area.id}`] = ''; });
         // Nöbet ertesi kişileri çıkar (case-insensitive)
         const nobetErtesiPeople = (day.nobetErtesi || '')
             .split(',')
@@ -2410,8 +2409,19 @@ async function startAssignment() {
         // Set current week index for scoring function
         currentWeekIdx = getWeekIndexForDay(day.date.getDate());
 
+        // Fill the least flexible area first so a specialist is not consumed
+        // by a general area while its only eligible slot stays empty.
+        const availableCount = area => state.people.filter(person =>
+            !nobetErtesiPeople.includes(person.toLowerCase()) &&
+            !isOnDayOff(person, day) && canWorkInArea(person, area.id)
+        ).length;
+        const orderedAreas = [...state.workAreas].sort((a, b) =>
+            availableCount(a) - availableCount(b) ||
+            state.workAreas.indexOf(a) - state.workAreas.indexOf(b)
+        );
+
         // === STEP 2: Fill slots with 3-tier constraints + weekly priority as HARD constraint ===
-        state.workAreas.forEach((area) => {
+        orderedAreas.forEach((area) => {
             const field = `workArea${area.id}`;
 
             /**
@@ -2422,7 +2432,7 @@ async function startAssignment() {
              * 3. Çalışabilir/Çalışamaz (blocked areas) → çalışamaz
              * 4. Pair constraints → aynı gün çalışamaz
              */
-            function getBaseAvailable(relaxPairConstraints) {
+            function getBaseAvailable() {
                 return state.people.filter(p => {
                     // Skip if already used today
                     if (usedToday.has(p)) return false;
@@ -2436,11 +2446,9 @@ async function startAssignment() {
                     // HARD CONSTRAINT 3: Check constraint: blocked from this area? (ASLA es geçilmez)
                     if (!canWorkInArea(p, area.id)) return false;
 
-                    // HARD CONSTRAINT 4: Check pair constraints (unless relaxed)
-                    if (!relaxPairConstraints) {
-                        for (const otherPerson of usedToday) {
-                            if (!canWorkTogether(p, otherPerson)) return false;
-                        }
+                    // HARD CONSTRAINT 4: Pair rules must never be relaxed silently.
+                    for (const otherPerson of usedToday) {
+                        if (!canWorkTogether(p, otherPerson)) return false;
                     }
 
                     return true;
@@ -2475,7 +2483,7 @@ async function startAssignment() {
                 }
             }
 
-            const availablePeople = getBaseAvailable(false);
+            const availablePeople = getBaseAvailable();
 
             /**
              * 3-Tier candidate selection:
@@ -2496,30 +2504,10 @@ async function startAssignment() {
             });
 
             // Try tiers in order
-            let candidates = tier1.length > 0 ? tier1 : (tier2.length > 0 ? tier2 : tier3);
+            const candidates = tier1.length > 0 ? tier1 : (tier2.length > 0 ? tier2 : tier3);
 
             if (candidates.length === 0) {
-                // No one available with constraints - try relaxing pair constraints
-                const relaxedAvailable = getBaseAvailable(true);
-                const rTier1 = [], rTier2 = [], rTier3 = [];
-                relaxedAvailable.forEach(p => {
-                    const priority = getAreaPriority(p, area.id);
-                    if (priority === 'allowed') rTier1.push(p);
-                    else if (priority === 'preferred') rTier2.push(p);
-                    else if (priority === 'default') rTier3.push(p);
-                });
-                candidates = rTier1.length > 0 ? rTier1 : (rTier2.length > 0 ? rTier2 : rTier3);
-
-                if (candidates.length > 0) {
-                    const person = selectBestCandidate(candidates, area.id);
-                    day[field] = person;
-                    usedToday.add(person);
-                    perPersonPerArea[person][area.id]++;
-                    totalPerPerson[person]++;
-                    console.log(`⚠️ Relaxed pair constraint for ${person} in ${area.name}`);
-                } else {
-                    console.warn(`❌ No one available for ${area.name} on ${day.date.toLocaleDateString()}`);
-                }
+                console.warn(`❌ No one available for ${area.name} on ${day.date.toLocaleDateString()}`);
                 return;
             }
 
@@ -2553,11 +2541,12 @@ async function startAssignment() {
                     if (day[f]) usedToday.add(day[f]);
                 });
 
-                // Try to find anyone available (relaxing pair constraints)
+                // A required area cannot override leave, area, or pair rules.
                 const candidate = state.people.find(p => {
                     if (usedToday.has(p)) return false;
                     if (nobetErtesiPeople.includes(p.toLowerCase())) return false;
-                    if (!ConstraintEngine.isAvailable(p, day, rule.areaId)) return false;
+                    if (isOnDayOff(p, day) || !canWorkInArea(p, rule.areaId)) return false;
+                    if ([...usedToday].some(other => !canWorkTogether(p, other))) return false;
                     return true;
                 });
 
@@ -2577,8 +2566,12 @@ async function startAssignment() {
     saveToLocalStorage();
     state.hasUnsavedChanges = false;
 
-    // Show success message with constraint summary
-    if (summary.total > 0) {
+    const unfilledSlots = state.schedule.reduce((count, day) => count +
+        state.workAreas.filter(area => !day[`workArea${area.id}`]).length, 0);
+    // Never call an incomplete roster complete.
+    if (unfilledSlots > 0) {
+        Toast.warning(`${unfilledSlots} alan boş kaldı. Koşulları ve personel sayısını kontrol edin.`, 10000);
+    } else if (summary.total > 0) {
         const aiNote = summary.aiSummary ? `\n${summary.aiSummary}` : '';
         Toast.success(`Program oluşturuldu! (${summary.total} koşul uygulandı)${aiNote}`, 7000);
     } else {
@@ -3259,9 +3252,9 @@ async function shareCurrentVersion() {
 
         Toast.info('Takvim kaydediliyor...');
 
-        // Save current schedule to backend (skipCounter: share-triggered saves don't count)
+        // Save current schedule to backend before publishing it.
         try {
-            await ApiClient.request(`/calendars/${calId}?skipCounter=true`, {
+            await ApiClient.request(`/calendars/${calId}`, {
                 method: 'PUT',
                 body: JSON.stringify({
                     title: state.scheduleTitle,
@@ -3270,7 +3263,7 @@ async function shareCurrentVersion() {
                     people: state.people,
                     workAreas: state.workAreas,
                     schedule: state.schedule,
-                    conditions: state.conditions,
+                    conditions: state.aiConditions,
                     shiftDelays: state.shiftDelays
                 })
             });
@@ -4066,8 +4059,8 @@ async function saveToCloud() {
 
     try {
         let result;
-        if (state.calendarId) {
-            result = await ApiClient.updateCalendar(state.calendarId, calendarData);
+        if (state.backendCalendarId) {
+            result = await ApiClient.updateCalendar(state.backendCalendarId, calendarData);
             Toast.success('Takvim güncellendi!');
         } else {
             if (!checkUserLimits('create')) return false;
@@ -4104,10 +4097,10 @@ async function loadFromCloud(calendarId) {
         state.selectedMonth = cal.month;
         state.selectedYear = cal.year;
         state.people = cal.people || [];
-        state.workAreas = cal.workAreas || [];
+        state.workAreas = cal.work_areas || cal.workAreas || [];
         state.aiConditions = cal.conditions || '';
-        state.shiftDelays = cal.shiftDelays || {};
-        state.createdAt = cal.createdAt;
+        state.shiftDelays = cal.shift_delays || cal.shiftDelays || {};
+        state.createdAt = cal.created_at || cal.createdAt;
 
         if (cal.schedule && cal.schedule.length > 0) {
             state.schedule = cal.schedule.map(day => ({
@@ -4143,7 +4136,7 @@ function updateUserUI() {
     const userArea = document.getElementById('userAuthArea');
     if (!userArea) return;
 
-    if (AuthState.isLoggedIn()) {
+    if (AuthState.isLoggedIn() && AuthState.user) {
         const user = AuthState.user;
         const usage = AuthState.usage;
         const initials = user.name

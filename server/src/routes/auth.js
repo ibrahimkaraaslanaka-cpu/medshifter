@@ -18,14 +18,42 @@ const router = express.Router();
  */
 router.get('/me', authMiddleware, async (req, res, next) => {
     try {
-        const { data: profile, error } = await req.supabaseUser
+        let { data: profile, error } = await req.supabaseAdmin
             .from('profiles')
             .select('*')
             .eq('id', req.userId)
             .single();
 
-        if (error || !profile) {
-            return res.status(404).json({ error: 'Kullanıcı profili bulunamadı' });
+        if (error && error.code !== 'PGRST116') throw error;
+
+        // An OAuth account can exist even if the database's signup trigger was
+        // absent or failed. Create only the missing row, preserving paid plans.
+        if (!profile) {
+            const metadata = req.authUser.user_metadata || {};
+            const { data: created, error: createError } = await req.supabaseAdmin
+                .from('profiles')
+                .insert({
+                    id: req.userId,
+                    email: req.userEmail,
+                    name: metadata.full_name || metadata.name || req.userEmail.split('@')[0],
+                    avatar: metadata.avatar_url || metadata.picture || null,
+                    plan: 'FREE',
+                    calendars_used_this_month: 0,
+                    saves_used_this_month: 0,
+                    exports_used_this_month: 0,
+                    usage_reset_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (createError && createError.code !== '23505') throw createError;
+            if (created) profile = created;
+            else {
+                const retry = await req.supabaseAdmin.from('profiles')
+                    .select('*').eq('id', req.userId).single();
+                if (retry.error) throw retry.error;
+                profile = retry.data;
+            }
         }
 
         // Reset usage if new month

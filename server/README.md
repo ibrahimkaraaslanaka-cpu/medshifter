@@ -1,5 +1,8 @@
 # Med Shifter - Backend Setup Guide
 
+> Production deployment: use [RELEASE.md](../RELEASE.md). Some historical
+> PostgreSQL/Prisma setup notes below predate the Supabase backend.
+
 ## Proje Yapısı
 
 ```

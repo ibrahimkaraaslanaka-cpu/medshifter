@@ -826,13 +826,23 @@
         </div>
     </div>
 
-    <script src="config.js?v=2.0.2"></script>
+    <script src="config.js?v=2.0.3"></script>
     <script>
         // Initialize Supabase client
-        const supabaseClient = window.supabase.createClient(
+        const supabaseClient = window.supabaseClient || window.supabase.createClient(
             window.AppConfig.SUPABASE_URL,
             window.AppConfig.SUPABASE_ANON_KEY
         );
+
+        function destinationAfterLogin() {
+            const requested = new URLSearchParams(window.location.search).get('redirect');
+            return ['app', 'app.html', 'profile', 'profile.html', 'checkout', 'checkout.html']
+                .includes(requested) ? `/${requested.endsWith('.html') ? requested : requested + '.html'}` : '/app.html';
+        }
+
+        function completeLogin() {
+            window.location.replace(destinationAfterLogin());
+        }
 
         // Tab switching
         function showLogin() {
@@ -907,9 +917,7 @@
                 showSuccess('Giriş başarılı! Yönlendiriliyorsunuz...');
 
                 setTimeout(() => {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirect = urlParams.get('redirect');
-                    window.location.href = redirect ? `/${redirect}` : '/app.html';
+                    completeLogin();
                 }, 1000);
 
             } catch (error) {
@@ -936,6 +944,7 @@
                     email,
                     password,
                     options: {
+                        emailRedirectTo: window.location.origin + '/login.html?redirect=app.html',
                         data: {
                             full_name: name,
                             name: name
@@ -955,9 +964,7 @@
                 } else {
                     showSuccess('Kayıt başarılı! Yönlendiriliyorsunuz...');
                     setTimeout(() => {
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const redirect = urlParams.get('redirect');
-                        window.location.href = redirect ? `/${redirect}` : '/app.html';
+                        completeLogin();
                     }, 1000);
                 }
 
@@ -976,7 +983,7 @@
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/app.html'
+                        redirectTo: window.location.origin + '/login.html?redirect=app.html'
                     }
                 });
 
@@ -999,11 +1006,21 @@
                 showError('Uygulamayı kullanmak için giriş yapmanız veya kayıt olmanız gerekmektedir.');
             }
 
-            // Check existing session
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                const redirect = urlParams.get('redirect');
-                window.location.href = redirect ? `/${redirect}` : '/app.html';
+            const hashParams = new URLSearchParams(window.location.hash.slice(1));
+            const oauthError = urlParams.get('error_description') || urlParams.get('error') ||
+                hashParams.get('error_description') || hashParams.get('error');
+            if (oauthError) {
+                showError('Google ile giriş tamamlanamadı: ' + oauthError);
+                return;
+            }
+
+            // Supabase restores the OAuth callback session before getSession resolves.
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                if (session) completeLogin();
+            } catch (error) {
+                showError('Oturum kontrol edilemedi: ' + error.message);
             }
         });
     </script>

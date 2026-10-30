@@ -100,8 +100,8 @@ router.post('/', authMiddleware, async (req, res, next) => {
             .insert({
                 user_id: req.userId,
                 title: title || `${month + 1}/${year} Takvimi`,
-                month: month || new Date().getMonth(),
-                year: year || new Date().getFullYear(),
+                month: month ?? new Date().getMonth(),
+                year: year ?? new Date().getFullYear(),
                 people: people || [],
                 work_areas: workAreas || [],
                 schedule: schedule || [],
@@ -195,15 +195,10 @@ router.put('/:id', authMiddleware, async (req, res, next) => {
 
         if (updateError) throw updateError;
 
-        // Increment save counter (skip if auto-save for share)
-        if (req.query.skipCounter !== 'true') {
-            await req.supabaseAdmin
-                .from('profiles')
-                .update({
-                    saves_used_this_month: profile.saves_used_this_month + 1
-                })
-                .eq('id', req.userId);
-        }
+        await req.supabaseAdmin
+            .from('profiles')
+            .update({ saves_used_this_month: profile.saves_used_this_month + 1 })
+            .eq('id', req.userId);
 
         res.json({
             message: 'Takvim kaydedildi',
