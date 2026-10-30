@@ -1,15 +1,16 @@
 # MedShifter production release
 
 The public site is served by Nginx from `/var/www/medshifter`; the Express API
-runs behind `/api` on port 3001. GitHub pushes do not deploy this VPS by
+runs behind `/api` on port 3002. GitHub pushes do not deploy this VPS by
 themselves.
 
 ## Emergency security step
 
-The old Nginx configuration serves `/server/.env` and `/.git/config` publicly.
-Apply the access rules in `nginx.conf` on the VPS **before** copying or running
-the new application. Check the effective Nginx configuration, reload it, then
-verify all four requests return 404:
+The production Nginx file is `/etc/nginx/sites-enabled/medshifter`. It now
+blocks `/server/`, dotfiles, `nginx.conf`, and `create-test-users.js`. Preserve
+its existing port 3002 proxy and TLS settings when editing it; do not replace
+it wholesale with the repository's example `nginx.conf`. Check the effective
+configuration, reload it, then verify all four requests return 404:
 
 ```sh
 sudo nginx -t && sudo systemctl reload nginx
@@ -38,10 +39,11 @@ the change in its dashboard. Do not put secret values in Git or shell history.
 ## Release checks
 
 ```sh
+git -C /var/www/medshifter pull --ff-only origin main
 cd /var/www/medshifter/server
 npm ci --omit=dev
 npm test
-pm2 restart medshifter-api --update-env
+pm2 restart medshifter
 curl -f https://medshifter.app/api/health
 curl -f https://medshifter.app/api/ready
 ```
