@@ -15,7 +15,7 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || crypto.randomBytes(32).
 /**
  * Middleware to verify admin JWT token
  */
-function adminAuthMiddleware(req, res, next) {
+async function adminAuthMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -40,8 +40,15 @@ function adminAuthMiddleware(req, res, next) {
             });
         }
 
-        req.adminId = decoded.adminId;
-        req.adminRole = decoded.role;
+        // Re-check the current database role so deleting or demoting an admin
+        // revokes old tokens immediately instead of waiting eight hours.
+        const { data: admin, error } = await req.supabaseAdmin
+            .from('admins').select('id, role').eq('id', decoded.adminId).single();
+        if (error || !admin) {
+            return res.status(401).json({ error: 'Admin hesabı geçersiz', code: 1002, type: 'AUTH_INVALID_TOKEN' });
+        }
+        req.adminId = admin.id;
+        req.adminRole = admin.role;
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

@@ -3,7 +3,9 @@
  * Handles plan restrictions and usage tracking
  */
 
-// Plan limits configuration
+const { readSettings } = require('./siteSettings');
+
+// Fallback plan limits; editable plans are loaded from site settings.
 const PLAN_LIMITS = {
     UNLIMITED: {
         calendarsPerMonth: Number.MAX_SAFE_INTEGER,
@@ -57,7 +59,10 @@ function getEffectivePlan(profile) {
  * Get limits for a specific plan
  */
 function getPlanLimits(plan) {
-    return PLAN_LIMITS[plan] || PLAN_LIMITS.FREE;
+    if (plan === 'UNLIMITED') return PLAN_LIMITS.UNLIMITED;
+    const settings = readSettings();
+    const selected = settings.limits[plan] || settings.limits.FREE;
+    return { ...selected, isLifetime: plan === 'FREE' };
 }
 
 /**

@@ -93,17 +93,17 @@ test('infeasible pair rule leaves a slot empty instead of assigning a forbidden 
     assert.ok(!(names.includes('A') && names.includes('B')), 'forbidden pair must not work on one day');
 });
 
-test('Google signup uses the Supabase OAuth callback on the login page', async () => {
+test('Google signup exchanges the direct Google ID token with Supabase', async () => {
     const html = fs.readFileSync(path.join(__dirname, '../../login.html'), 'utf8');
     const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
-    let oauthOptions;
+    let tokenOptions, destination;
     const elements = new Map();
     const context = vm.createContext({
         window: {
             supabaseClient: { auth: {
-                async signInWithOAuth(options) { oauthOptions = options; return { data: {}, error: null }; }
+                async signInWithIdToken(options) { tokenOptions = options; return { data: {}, error: null }; }
             } },
-            location: { origin: 'https://medshifter.app', search: '?redirect=https://evil.example', hash: '' }
+            location: { origin: 'https://medshifter.app', search: '?redirect=https://evil.example', hash: '', replace(value) { destination = value; } }
         },
         document: {
             addEventListener() {},
@@ -116,9 +116,10 @@ test('Google signup uses the Supabase OAuth callback on the login page', async (
     });
     vm.runInContext(script, context);
     assert.equal(vm.runInContext('destinationAfterLogin()', context), '/app.html');
-    await vm.runInContext('handleGoogleSignIn()', context);
-    assert.equal(oauthOptions.provider, 'google');
-    assert.equal(oauthOptions.options.redirectTo, 'https://medshifter.app/login.html?redirect=app.html');
+    await vm.runInContext('handleGoogleCredential({ credential: "signed-id-token" })', context);
+    assert.equal(tokenOptions.provider, 'google');
+    assert.equal(tokenOptions.token, 'signed-id-token');
+    assert.equal(destination, '/app.html');
 });
 
 test('a feasible roster fills each area once per day and respects leave and post-shift rest', async () => {

@@ -1068,6 +1068,35 @@
         let isYearly = true;
         let currency = 'try'; // 'usd' or 'try'
 
+        async function loadLivePricing() {
+            try {
+                const response = await fetch(`${window.AppConfig.API_URL}/site/settings`, { cache: 'no-store' });
+                if (!response.ok) throw new Error('Fiyatlar yüklenemedi');
+                const { settings } = await response.json();
+                for (const [plan, id] of [['INDIVIDUAL', 'individualPrice'], ['BUSINESS', 'businessPrice']]) {
+                    const amount = document.querySelector(`#${id} .price-amount`);
+                    for (const period of ['monthly', 'yearly']) {
+                        for (const curr of ['TRY', 'USD']) {
+                            amount.dataset[curr.toLowerCase() + (period === 'monthly' ? 'Monthly' : 'Yearly')] = settings.prices[plan][period][curr];
+                        }
+                    }
+                }
+                for (const [index, plan] of ['FREE', 'INDIVIDUAL', 'BUSINESS'].entries()) {
+                    const features = document.querySelectorAll('.pricing-card')[index]?.querySelectorAll('.plan-features strong');
+                    if (!features || features.length < 4) continue;
+                    const limits = settings.limits[plan];
+                    [limits.calendarsPerMonth, limits.conditionsLimit, limits.peopleLimit, limits.versionsPerMonth]
+                        .forEach((value, position) => { features[position].textContent = value; });
+                }
+                updatePrices();
+            } catch (error) {
+                document.querySelectorAll('.checkout-link').forEach(link => {
+                    link.setAttribute('aria-disabled', 'true');
+                    link.title = 'Güncel fiyatlar yüklenemedi';
+                });
+            }
+        }
+
         function updatePrices() {
             const priceAmounts = document.querySelectorAll('.price-amount[data-usd-monthly]');
             const pricePeriods = document.querySelectorAll('.price-period[data-monthly]');
@@ -1106,6 +1135,7 @@
             document.getElementById('yearlyLabel').classList.toggle('active', isYearly);
 
             updatePrices();
+            loadLivePricing();
         }
 
         function setCurrency(curr) {
@@ -1145,6 +1175,7 @@
             document.querySelectorAll('.checkout-link').forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
+                    if (this.getAttribute('aria-disabled') === 'true') return;
                     const plan = this.dataset.plan;
                     const period = isYearly ? 'yearly' : 'monthly';
                     const curr = currency === 'usd' ? 'USD' : 'TRY';
