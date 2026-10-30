@@ -158,3 +158,29 @@ test('a feasible roster fills each area once per day and respects leave and post
     assert.ok(![schedule[2].workArea1, schedule[2].workArea2, schedule[2].workArea3].includes('A'));
     assert.ok(Math.max(...Object.values(counts)) - Math.min(...Object.values(counts)) <= 1);
 });
+
+test('a specialist is assigned to the area only they can cover', async () => {
+    const source = fs.readFileSync(path.join(__dirname, '../../app.js'), 'utf8');
+    const context = vm.createContext({
+        window: {}, document: { addEventListener() {} },
+        localStorage: { setItem() {} }, console: { log() {}, warn() {}, error() {} },
+        setTimeout, clearTimeout, Date
+    });
+    vm.runInContext(source, context);
+    vm.runInContext(`
+        state.people = ['A', 'B', 'C'];
+        state.workAreas = [{id: 1, name: 'Genel'}, {id: 2, name: 'Uzman'}];
+        state.schedule = [{date: new Date(2026, 9, 30), dayName: 'Cuma', nobetErtesi: '', workArea1: '', workArea2: ''}];
+        visualConstraints.pairRules = [];
+        visualConstraints.personAreaRules = {B: {2: 'blocked'}, C: {2: 'blocked'}};
+        visualConstraints.dayOffRules = {};
+        visualConstraints.weeklyPriority = {};
+        visualConstraints.seniorityOrder = [];
+        renderScheduleTable = updateStats = renderDetailedStats = renderActiveConstraints = saveToLocalStorage = () => {};
+        Toast.success = Toast.warning = Toast.info = () => {};
+    `, context);
+    await vm.runInContext('startAssignment()', context);
+    const day = vm.runInContext('state.schedule[0]', context);
+    assert.equal(day.workArea2, 'A');
+    assert.ok(['B', 'C'].includes(day.workArea1));
+});

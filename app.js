@@ -2409,8 +2409,19 @@ async function startAssignment() {
         // Set current week index for scoring function
         currentWeekIdx = getWeekIndexForDay(day.date.getDate());
 
+        // Fill the least flexible area first so a specialist is not consumed
+        // by a general area while its only eligible slot stays empty.
+        const availableCount = area => state.people.filter(person =>
+            !nobetErtesiPeople.includes(person.toLowerCase()) &&
+            !isOnDayOff(person, day) && canWorkInArea(person, area.id)
+        ).length;
+        const orderedAreas = [...state.workAreas].sort((a, b) =>
+            availableCount(a) - availableCount(b) ||
+            state.workAreas.indexOf(a) - state.workAreas.indexOf(b)
+        );
+
         // === STEP 2: Fill slots with 3-tier constraints + weekly priority as HARD constraint ===
-        state.workAreas.forEach((area) => {
+        orderedAreas.forEach((area) => {
             const field = `workArea${area.id}`;
 
             /**
