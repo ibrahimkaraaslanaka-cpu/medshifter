@@ -25,7 +25,7 @@
         VERSION: '2.0.0',
         // Supabase
         SUPABASE_URL: 'https://hkoicikmwbkbmwxbpxth.supabase.co',
-        SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhrb2ljaWttd2JrYm13eGJweHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NDUwOTcsImV4cCI6MjA4NjEyMTA5N30.B0nl_WAWWWeHvgEqu9TBwVbDWgxq1MUzw18ozp0hUA8'
+        SUPABASE_ANON_KEY: 'sb_publishable_kyWsRMP18mnauJXSAaXA7A_-mRU8lCw'
     };
 
     // Initialize Supabase client (available globally)
