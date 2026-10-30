@@ -35,6 +35,7 @@ async function authMiddleware(req, res, next) {
 
         req.userId = user.id;
         req.userEmail = user.email;
+        req.authUser = user;
         req.supabaseUser = supabase; // User-scoped client for RLS
         next();
     } catch (error) {
@@ -69,6 +70,7 @@ async function optionalAuth(req, res, next) {
         if (!error && user) {
             req.userId = user.id;
             req.userEmail = user.email;
+            req.authUser = user;
             req.supabaseUser = supabase;
         }
     } catch (error) {

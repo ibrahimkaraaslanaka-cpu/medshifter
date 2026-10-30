@@ -116,6 +116,19 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Readiness also checks the database required for signup and cloud calendars.
+app.get('/api/ready', async (req, res) => {
+    try {
+        const { error } = await supabaseAdmin.from('profiles')
+            .select('id', { head: true }).limit(1);
+        if (error) throw error;
+        res.json({ status: 'ready' });
+    } catch (error) {
+        logger.error('Readiness check failed', { error: error.message });
+        res.status(503).json({ status: 'unavailable' });
+    }
+});
+
 // ============================================
 // Error Handling
 // ============================================
@@ -131,10 +144,6 @@ app.listen(PORT, () => {
         port: PORT
     });
 
-    // Security warnings
-    if (!process.env.ADMIN_JWT_SECRET) {
-        logger.warn('⚠️  ADMIN_JWT_SECRET is not set — using predictable fallback. Set it in .env for production!');
-    }
 });
 
 // Graceful shutdown

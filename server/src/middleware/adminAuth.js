@@ -4,9 +4,13 @@
  */
 
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 // Admin JWT secret - should be different from user JWT secret
-const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET + '_admin';
+if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_JWT_SECRET) {
+    throw new Error('ADMIN_JWT_SECRET must be set in production');
+}
+const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || crypto.randomBytes(32).toString('hex');
 
 /**
  * Middleware to verify admin JWT token
