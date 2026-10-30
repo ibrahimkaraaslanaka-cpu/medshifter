@@ -184,3 +184,27 @@ test('a specialist is assigned to the area only they can cover', async () => {
     assert.equal(day.workArea2, 'A');
     assert.ok(['B', 'C'].includes(day.workArea1));
 });
+
+test('a deleted weekly-priority person cannot crash roster generation', async () => {
+    const source = fs.readFileSync(path.join(__dirname, '../../app.js'), 'utf8');
+    const context = vm.createContext({
+        window: {}, document: { addEventListener() {} },
+        localStorage: { setItem() {} }, console: { log() {}, warn() {}, error() {} },
+        setTimeout, clearTimeout, Date
+    });
+    vm.runInContext(source, context);
+    vm.runInContext(`
+        state.people = ['A', 'B', 'C'];
+        state.workAreas = [{id: 1, name: 'Acil'}];
+        state.schedule = [{date: new Date(2026, 9, 1), dayName: 'Perşembe', nobetErtesi: '', workArea1: ''}];
+        visualConstraints.pairRules = [];
+        visualConstraints.personAreaRules = {};
+        visualConstraints.dayOffRules = {};
+        visualConstraints.weeklyPriority = {0: {1: 'Deleted'}};
+        visualConstraints.seniorityOrder = [];
+        renderScheduleTable = updateStats = renderDetailedStats = renderActiveConstraints = saveToLocalStorage = () => {};
+        Toast.success = Toast.warning = Toast.info = () => {};
+    `, context);
+    await vm.runInContext('startAssignment()', context);
+    assert.equal(vm.runInContext('state.schedule[0].workArea1', context), 'A');
+});
