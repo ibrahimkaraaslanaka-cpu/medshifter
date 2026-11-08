@@ -1,0 +1,11 @@
+[Unit]
+Description=Check MedShifter Supabase database every eight hours
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=8h
+RandomizedDelaySec=5min
+Unit=medshifter-supabase-keepalive.service
+
+[Install]
+WantedBy=timers.target
