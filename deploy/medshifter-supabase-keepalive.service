@@ -1,0 +1,14 @@
+[Unit]
+Description=MedShifter Supabase database activity check
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/var/www/medshifter/server
+ExecStart=/usr/bin/node /var/www/medshifter/server/scripts/supabase-keepalive.js
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+PrivateTmp=true
