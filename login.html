@@ -665,7 +665,9 @@
 
 <body>
     <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/13.2.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/13.2.0/firebase-auth-compat.js"></script>
+    <script src="firebase-auth-adapter.js?v=2.1.0"></script>
     <div class="bg-animation"></div>
 
     <!-- Floating Medical Icons -->
@@ -757,13 +759,10 @@
         </div>
     </div>
 
-    <script src="config.js?v=2.0.4"></script>
+    <script src="config.js?v=2.1.0"></script>
     <script>
         // Initialize Supabase client
-        const supabaseClient = window.supabaseClient || window.supabase.createClient(
-            window.AppConfig.SUPABASE_URL,
-            window.AppConfig.SUPABASE_ANON_KEY
-        );
+        const supabaseClient = window.supabaseClient || window.supabase.createClient();
 
         function destinationAfterLogin() {
             const requested = new URLSearchParams(window.location.search).get('redirect');
