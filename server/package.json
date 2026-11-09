@@ -1,7 +1,10 @@
 {
     "name": "medshifter-server",
     "version": "2.0.0",
-    "description": "Med Shifter Backend API (Supabase)",
+    "description": "MedShifter Backend API",
+    "engines": {
+        "node": ">=22"
+    },
     "main": "src/index.js",
     "scripts": {
         "start": "node src/index.js",
