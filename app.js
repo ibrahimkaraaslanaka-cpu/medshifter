@@ -5,14 +5,11 @@
  */
 
 // ============================================
-// Supabase Client (initialized in config.js or here as fallback)
+// Authentication client (initialized in config.js or here as fallback)
 // ============================================
-const supabaseClient = window.supabaseClient || window.supabase?.createClient(
-    window.AppConfig?.SUPABASE_URL,
-    window.AppConfig?.SUPABASE_ANON_KEY
-);
+const supabaseClient = window.supabaseClient || window.supabase?.createClient();
 
-// (Auth check is handled in init() via Supabase session detection)
+// (Auth check is handled in init() via the Firebase session bridge.)
 
 // ============================================
 // State Management

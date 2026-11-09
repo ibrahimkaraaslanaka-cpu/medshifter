@@ -7,7 +7,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const { createClient } = require('@supabase/supabase-js');
+const { createDataClient } = require('./services/dataClient');
 const fs = require('fs');
 const path = require('path');
 
@@ -35,10 +35,7 @@ const PORT = process.env.PORT || 3001;
 app.set('trust proxy', 1);
 
 // Supabase Admin Client (service_role for backend operations)
-const supabaseAdmin = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseAdmin = createDataClient();
 
 // Create logs directory if it doesn't exist
 const logsDir = path.join(__dirname, '../logs');

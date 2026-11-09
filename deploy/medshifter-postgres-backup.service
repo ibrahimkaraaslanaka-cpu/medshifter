@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up MedShifter PostgreSQL and site settings
+After=postgresql.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/medshifter-postgres-backup

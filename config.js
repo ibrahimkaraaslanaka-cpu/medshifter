@@ -22,19 +22,22 @@
     window.AppConfig = {
         API_URL: apiUrl,
         IS_PRODUCTION: isProduction,
-        VERSION: '2.0.0',
-        // Supabase
-        SUPABASE_URL: 'https://hkoicikmwbkbmwxbpxth.supabase.co',
-        SUPABASE_ANON_KEY: 'sb_publishable_kyWsRMP18mnauJXSAaXA7A_-mRU8lCw',
+        VERSION: '2.1.0',
+        FIREBASE_CONFIG: {
+            apiKey: 'AIzaSyDQbgfWPByHjTdtJMuK12UsxKsRW3Rv7w0',
+            authDomain: 'medshifter-app.firebaseapp.com',
+            projectId: 'medshifter-app',
+            storageBucket: 'medshifter-app.firebasestorage.app',
+            messagingSenderId: '436970677501',
+            appId: '1:436970677501:web:d64dcd9589d23066740a94'
+        },
         GOOGLE_CLIENT_ID: '1044013231097-cfrcgnv291j2l5n96i4kfmld210r4t6e.apps.googleusercontent.com'
     };
 
-    // Initialize Supabase client (available globally)
-    if (window.supabase) {
-        window.supabaseClient = window.supabase.createClient(
-            window.AppConfig.SUPABASE_URL,
-            window.AppConfig.SUPABASE_ANON_KEY
-        );
+    // Keep the existing page session interface while changing its provider.
+    if (window.FirebaseAuthAdapter) {
+        window.supabase = window.FirebaseAuthAdapter;
+        window.supabaseClient = window.FirebaseAuthAdapter.createClient();
     }
 
     if (!isProduction) {

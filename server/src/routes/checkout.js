@@ -351,21 +351,23 @@ router.post('/paytr-callback', express.urlencoded({ extended: true }), async (re
             .update(hashStr)
             .digest('base64');
 
-        if (hash !== expectedHash) {
+        if (typeof hash !== 'string' || hash.length !== expectedHash.length ||
+            !crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(expectedHash))) {
             logger.error('PayTR callback: invalid hash', { merchant_oid });
             return res.status(400).send('PAYTR notification failed: bad hash');
         }
 
         // Check if order already processed (idempotency)
-        const { data: existingOrder } = await req.supabaseAdmin
+        const { data: existingOrder, error: lookupError } = await req.supabaseAdmin
             .from('orders')
             .select('*')
             .eq('id', merchant_oid)
             .single();
 
+        if (lookupError && lookupError.code !== 'PGRST116') throw lookupError;
         if (!existingOrder) {
             logger.error('PayTR callback: order not found', { merchant_oid });
-            return res.send('OK');
+            return res.status(500).send('Order not found');
         }
 
         // If already completed or cancelled, just respond OK
@@ -378,16 +380,6 @@ router.post('/paytr-callback', express.urlencoded({ extended: true }), async (re
         }
 
         if (status === 'success') {
-            // Payment successful — update order
-            await req.supabaseAdmin
-                .from('orders')
-                .update({
-                    status: 'completed',
-                    payment_provider_id: `PAYTR-${merchant_oid}`,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', merchant_oid);
-
             // Upgrade user plan
             const expiresAt = new Date();
             if (existingOrder.billing_period === 'yearly') {
@@ -396,7 +388,7 @@ router.post('/paytr-callback', express.urlencoded({ extended: true }), async (re
                 expiresAt.setMonth(expiresAt.getMonth() + 1);
             }
 
-            await req.supabaseAdmin
+            const { data: updatedProfile, error: profileError } = await req.supabaseAdmin
                 .from('profiles')
                 .update({
                     plan: existingOrder.plan,
@@ -406,7 +398,21 @@ router.post('/paytr-callback', express.urlencoded({ extended: true }), async (re
                     exports_used_this_month: 0,
                     usage_reset_at: new Date().toISOString()
                 })
-                .eq('id', existingOrder.user_id);
+                .eq('id', existingOrder.user_id)
+                .select('id')
+                .single();
+            if (profileError || !updatedProfile) throw profileError || new Error('Profile not updated');
+
+            // Mark complete only after the entitlement is actually granted.
+            const { error: orderError } = await req.supabaseAdmin
+                .from('orders')
+                .update({
+                    status: 'completed',
+                    payment_provider_id: `PAYTR-${merchant_oid}`,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', merchant_oid);
+            if (orderError) throw orderError;
 
             logger.info('Payment successful — user plan upgraded', {
                 userId: existingOrder.user_id,
@@ -416,13 +422,14 @@ router.post('/paytr-callback', express.urlencoded({ extended: true }), async (re
             });
         } else {
             // Payment failed
-            await req.supabaseAdmin
+            const { error: orderError } = await req.supabaseAdmin
                 .from('orders')
                 .update({
                     status: 'failed',
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', merchant_oid);
+            if (orderError) throw orderError;
 
             logger.info('Payment failed', {
                 userId: existingOrder.user_id,
@@ -436,8 +443,8 @@ router.post('/paytr-callback', express.urlencoded({ extended: true }), async (re
         res.send('OK');
     } catch (error) {
         logger.error('PayTR callback error', { error: error.message, stack: error.stack });
-        // Still try to send OK so PayTR doesn't retry endlessly
-        res.send('OK');
+        // PayTR retries when it does not receive OK, so preserve failed updates.
+        res.status(500).send('Notification processing failed');
     }
 });
 

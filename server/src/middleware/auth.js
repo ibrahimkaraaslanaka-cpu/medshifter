@@ -1,83 +1,55 @@
-/**
- * Authentication Middleware (Supabase)
- * Validates Supabase JWT tokens and attaches user to request
- */
-
+/** Verify a user token from the configured authentication provider. */
 const { createClient } = require('@supabase/supabase-js');
 
-// Middleware to verify Supabase JWT token
-async function authMiddleware(req, res, next) {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Yetkilendirme gerekli' });
+async function resolveUser(token) {
+    if (process.env.AUTH_PROVIDER === 'firebase') {
+        const { getAuth } = require('../services/firebaseAuth');
+        const claims = await getAuth().verifyIdToken(token);
+        if (!claims.email || !claims.email_verified) throw new Error('Email is not verified');
+        return {
+            id: claims.uid,
+            email: claims.email,
+            user_metadata: {
+                full_name: claims.name || claims.email.split('@')[0],
+                avatar_url: claims.picture || null
+            }
+        };
     }
 
-    const token = authHeader.split(' ')[1];
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) throw error || new Error('Invalid token');
+    return user;
+}
 
+function bearerToken(req) {
+    const header = req.headers.authorization;
+    return header?.startsWith('Bearer ') ? header.slice(7) : null;
+}
+
+function attachUser(req, user) {
+    req.userId = user.id;
+    req.userEmail = user.email;
+    req.authUser = user;
+}
+
+async function authMiddleware(req, res, next) {
+    const token = bearerToken(req);
+    if (!token) return res.status(401).json({ error: 'Yetkilendirme gerekli' });
     try {
-        // Create a Supabase client with the user's token
-        const supabase = createClient(
-            process.env.SUPABASE_URL,
-            process.env.SUPABASE_ANON_KEY,
-            {
-                global: {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            }
-        );
-
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-
-        if (error || !user) {
-            return res.status(401).json({ error: 'Geçersiz veya süresi dolmuş token' });
-        }
-
-        req.userId = user.id;
-        req.userEmail = user.email;
-        req.authUser = user;
-        req.supabaseUser = supabase; // User-scoped client for RLS
+        attachUser(req, await resolveUser(token));
         next();
     } catch (error) {
-        console.error('Auth middleware error:', error);
-        return res.status(401).json({ error: 'Yetkilendirme hatası' });
+        return res.status(401).json({ error: 'Geçersiz veya süresi dolmuş oturum' });
     }
 }
 
-// Optional auth - doesn't fail if no token
 async function optionalAuth(req, res, next) {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return next();
+    const token = bearerToken(req);
+    if (token) {
+        try { attachUser(req, await resolveUser(token)); } catch (_) { /* Guest request. */ }
     }
-
-    const token = authHeader.split(' ')[1];
-
-    try {
-        const supabase = createClient(
-            process.env.SUPABASE_URL,
-            process.env.SUPABASE_ANON_KEY,
-            {
-                global: {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            }
-        );
-
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-
-        if (!error && user) {
-            req.userId = user.id;
-            req.userEmail = user.email;
-            req.authUser = user;
-            req.supabaseUser = supabase;
-        }
-    } catch (error) {
-        // Ignore invalid tokens for optional auth
-    }
-
     next();
 }
 
-module.exports = { authMiddleware, optionalAuth };
+module.exports = { authMiddleware, optionalAuth, resolveUser };
